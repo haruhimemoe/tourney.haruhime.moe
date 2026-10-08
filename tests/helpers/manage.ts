@@ -32,6 +32,8 @@ const MODULES: Record<string, () => Promise<Record<string, unknown>>> = {
     import("@/app/api/manage/[lineage]/[edition]/registrations/review/route"),
   "/api/manage/[lineage]/[edition]/settings": () =>
     import("@/app/api/manage/[lineage]/[edition]/settings/route"),
+  "/api/manage/[lineage]/[edition]/rounds": () =>
+    import("@/app/api/manage/[lineage]/[edition]/rounds/route"),
 };
 
 /** A body each route parses, so a refusal can't come from the body. */
@@ -49,6 +51,7 @@ const BODIES: Record<string, unknown> = {
   "/api/manage/[lineage]/[edition]/settings": {
     eligibility: { rank: null, countries: null, regions: null },
   },
+  "/api/manage/[lineage]/[edition]/rounds": { rounds: [] },
 };
 
 /**

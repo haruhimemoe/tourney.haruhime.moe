@@ -4,7 +4,7 @@
  *       the caps, the questions and eligibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Thu Oct 8, 2026
  */
 
 "use client";
@@ -15,6 +15,7 @@ import { type FormEvent, useState } from "react";
 import { postJson } from "@/lib/manage-client";
 import type { Edition } from "@/schemas/edition";
 import type { Question } from "@/schemas/question";
+import { fromLocalInput, toLocalInput } from "@/utils/local-time";
 import { EligibilityForm } from "./EligibilityForm";
 import { QuestionBuilder } from "./QuestionBuilder";
 
@@ -24,17 +25,6 @@ export type RegistrationSettingsFormProps = {
   edition: string;
   initial: Pick<Edition, "registration" | "questions" | "eligibility">;
 };
-
-/** An ISO instant as a datetime-local value in the browser's zone. */
-const toLocalInput = (iso: string | null): string => {
-  if (!iso) return "";
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
-
-const fromLocalInput = (value: string): string | null =>
-  value ? new Date(value).toISOString() : null;
 
 const toCap = (text: string): number | null => (/^\d+$/.test(text.trim()) ? Number(text) : null);
 

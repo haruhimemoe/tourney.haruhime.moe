@@ -66,6 +66,9 @@ export default async function ManageEditionPage({ params }: Props) {
         <TextLink href={`/manage/${lineage.slug}/${edition.slug}/settings/registration`}>
           Registration settings
         </TextLink>
+        <TextLink href={`/manage/${lineage.slug}/${edition.slug}/rounds`}>
+          Bracket and rounds
+        </TextLink>
       </nav>
       <SetupChecklist items={setupChecklist(edition, await listRounds(edition.id))} />
     </div>
