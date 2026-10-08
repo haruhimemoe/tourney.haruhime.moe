@@ -35,7 +35,7 @@ export default async function OverviewPage({ params }: EditionParams) {
   const page = await requirePublic(lineage, edition);
   const { edition: e, zone } = page;
   const at = (iso: string | null) => (iso ? <LocalTime at={iso} zone={zone} /> : "Not set");
-  const sides = e.sides.rosterMax === 1 ? "1v1" : `${e.sides.lineup}v${e.sides.lineup}`;
+  const sides = e.sides.kind === "solo" ? "1v1" : `${e.sides.lineup}v${e.sides.lineup}`;
   return (
     <div className="flex flex-col gap-6">
       <StatList
