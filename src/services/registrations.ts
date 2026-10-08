@@ -326,7 +326,7 @@ export const review = async (
   for (const doc of docs) {
     const next = reviewRegistration(toId(doc), to);
     if (!next.ok) {
-      const who = doc.snapshot.username;
+      const who = doc.snapshot?.username ?? String(doc.osuId);
       return fail(next.error.code, `${who}: ${next.error.message}`);
     }
     moved.push(next.value);

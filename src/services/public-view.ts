@@ -87,7 +87,9 @@ const buildPayload = async (lineage: Lineage, edition: Edition): Promise<PublicP
       .find({ editionId: edition.id }, { projection: { osuId: 1, "snapshot.username": 1 } })
       .toArray(),
   ]);
-  const usernames = new Map(regs.map((r) => [r.osuId, r.snapshot.username]));
+  const usernames = new Map(
+    regs.flatMap((r) => (r.snapshot ? [[r.osuId, r.snapshot.username] as const] : [])),
+  );
   const player = (osuId: number): PublicPlayer => ({
     osuId,
     username: usernames.get(osuId) ?? null,

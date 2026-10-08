@@ -50,7 +50,7 @@ export const teamFromRegistration = (
   if (edition.sides.kind === "solo" || !reg.team) {
     return {
       ...base,
-      name: uniqueTeamName(reg.snapshot.username, takenNames),
+      name: uniqueTeamName(reg.snapshot?.username ?? String(reg.osuId), takenNames),
       tag: null,
       roster: [reg.osuId],
       subs: [],

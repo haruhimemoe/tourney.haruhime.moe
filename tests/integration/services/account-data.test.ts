@@ -112,6 +112,11 @@ describe("deleteUser", () => {
       [null, 2, {}],
       [null, 3, {}],
     ]);
+    // Only the osu! id stays: no username, rank or country, no team block.
+    expect(rows.map((r) => [r.snapshot, r.team])).toEqual([
+      [null, null],
+      [null, null],
+    ]);
     expect(await getLineageBySlug(lineage.slug)).not.toBeNull();
   });
 

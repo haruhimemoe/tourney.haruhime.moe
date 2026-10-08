@@ -126,16 +126,18 @@ export function RegistrationsTable({ lineage, edition, rows, questions }: Regist
                 <Td>
                   <input
                     type="checkbox"
-                    aria-label={`Select ${r.snapshot.username}`}
+                    aria-label={`Select ${r.snapshot?.username ?? r.osuId}`}
                     checked={selected.includes(r.id)}
                     onChange={(e) => toggle(r.id, e.target.checked)}
                   />
                 </Td>
                 <Td>
-                  <div className="font-bold text-c1">{r.snapshot.username}</div>
+                  <div className="font-bold text-c1">
+                    {r.snapshot?.username ?? "Deleted account"}
+                  </div>
                   <div className="text-c3 text-xs tabular-nums">
-                    {r.osuId} · {r.snapshot.rank ? `#${r.snapshot.rank}` : "unranked"} ·{" "}
-                    {r.snapshot.country ?? "-"}
+                    {r.osuId} · {r.snapshot?.rank ? `#${r.snapshot.rank}` : "unranked"} ·{" "}
+                    {r.snapshot?.country ?? "-"}
                   </div>
                 </Td>
                 <Td>{r.status}</Td>

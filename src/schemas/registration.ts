@@ -24,7 +24,8 @@ export const StoredRegistrationSchema = RegistrationSchema.extend({
   editionId: IdSchema,
   userId: IdSchema.nullable(),
   answers: z.record(z.string(), z.unknown()),
-  snapshot: SnapshotSchema,
+  /** Null once the player deleted their account (only the osu! id stays). */
+  snapshot: SnapshotSchema.nullable(),
   team: z
     .object({
       name: z.string().trim().min(1).max(32),

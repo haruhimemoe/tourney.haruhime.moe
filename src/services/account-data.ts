@@ -74,7 +74,7 @@ export const deleteUser = async (userId: string): Promise<AppResult<{ deleted: n
     if (r.status === "approved" && done.has(r.editionId)) {
       await db.registrations.updateOne(
         { _id: r._id },
-        { $set: { userId: null, answers: {}, reviewNote: null } },
+        { $set: { userId: null, answers: {}, reviewNote: null, snapshot: null, team: null } },
       );
       continue;
     }
