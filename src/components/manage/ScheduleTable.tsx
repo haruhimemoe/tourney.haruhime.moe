@@ -10,7 +10,7 @@
 
 "use client";
 
-import { Button, Notice, Table, TBody, Td, TextInput, THead, Th } from "@haruhimemoe/ui";
+import { Button, Notice, Table, TBody, Td, TextInput, TextLink, THead, Th } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { postJson } from "@/lib/manage-client";
@@ -142,7 +142,11 @@ export function ScheduleTable({ lineage, edition, rows, zone }: ScheduleTablePro
         <TBody>
           {rows.map((r) => (
             <tr key={r.code} aria-label={r.code}>
-              <Td>{r.code}</Td>
+              <Td>
+                <TextLink href={`/manage/${lineage}/${edition}/matches/${r.code}`}>
+                  {r.code}
+                </TextLink>
+              </Td>
               <Td>{r.round}</Td>
               <Td>
                 {r.a ?? "TBD"} vs {r.b ?? "TBD"}

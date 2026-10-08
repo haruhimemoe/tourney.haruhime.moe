@@ -1,6 +1,7 @@
 /**
  * @file src/app/manage/[lineage]/[edition]/schedule/page.tsx
- * @desc The edition's schedule for lineage members: every match that will be played, by round.
+ * @desc The edition's schedule for lineage members: every match that is or was to be played,
+ *       each linking to its result editor.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
  * @modified Thu Oct 8, 2026
@@ -49,7 +50,7 @@ export default async function SchedulePage({ params }: Props) {
   await connectDb();
   const names = new Map((await listTeams(edition.id)).map((t) => [t.id, t.name]));
   const matches = await collections(getDb())
-    .matches.find({ editionId: edition.id, status: { $in: ["scheduled", "live"] } })
+    .matches.find({ editionId: edition.id, status: { $ne: "cancelled" } })
     .sort({ scheduledAt: 1, bracketCode: 1 })
     .toArray();
   return (

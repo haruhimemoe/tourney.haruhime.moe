@@ -49,6 +49,12 @@ const MODULES: Record<string, () => Promise<Record<string, unknown>>> = {
     import("@/app/api/manage/[lineage]/[edition]/matches/[code]/time/route"),
   "/api/manage/[lineage]/[edition]/schedule/suggest": () =>
     import("@/app/api/manage/[lineage]/[edition]/schedule/suggest/route"),
+  "/api/manage/[lineage]/[edition]/matches/[code]/result": () =>
+    import("@/app/api/manage/[lineage]/[edition]/matches/[code]/result/route"),
+  "/api/manage/[lineage]/[edition]/matches/[code]/forfeit": () =>
+    import("@/app/api/manage/[lineage]/[edition]/matches/[code]/forfeit/route"),
+  "/api/manage/[lineage]/[edition]/matches/[code]/fill": () =>
+    import("@/app/api/manage/[lineage]/[edition]/matches/[code]/fill/route"),
 };
 
 /** A body each route parses, so a refusal can't come from the body. */
@@ -74,6 +80,20 @@ const BODIES: Record<string, unknown> = {
   "/api/manage/[lineage]/[edition]/seeds": { method: "qualifiers" },
   "/api/manage/[lineage]/[edition]/matches/[code]/time": { at: null },
   "/api/manage/[lineage]/[edition]/schedule/suggest": { round: "SF" },
+  "/api/manage/[lineage]/[edition]/matches/[code]/result": {
+    score: { a: 5, b: 0 },
+    maps: [],
+    pickBans: [],
+    mpLinks: [],
+    streamUrl: null,
+    vodUrl: null,
+  },
+  "/api/manage/[lineage]/[edition]/matches/[code]/forfeit": { winner: "a" },
+  "/api/manage/[lineage]/[edition]/matches/[code]/fill": {
+    mpLink: "https://osu.ppy.sh/mp/1",
+    warmups: 0,
+    skip: [],
+  },
 };
 
 /**
