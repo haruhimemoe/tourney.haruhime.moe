@@ -71,6 +71,18 @@ const call = (
   );
 
 describe("registration route", () => {
+  it("refuses to register for a hidden edition", async () => {
+    const lineage = await openSolo();
+    await collections(getDb()).editions.updateOne(
+      { slug: "egc2026" },
+      { $set: { siteMode: "hidden" } },
+    );
+    const user = await createTestUser(1001);
+    const res = await call(POST, lineage, { cookie: user.cookie });
+    expect(res.status).toBe(404);
+    expect(await collections(getDb()).registrations.countDocuments()).toBe(0);
+  });
+
   it("refuses a cross-site POST and writes nothing", async () => {
     const lineage = await openSolo();
     const user = await createTestUser(1001);

@@ -29,6 +29,7 @@ import { revalidateEdition } from "@/lib/revalidate";
 import type { Edition } from "@/schemas/edition";
 import type { SessionUser } from "@/schemas/session-user";
 import { getEdition } from "@/services/editions";
+import { isVisible } from "@/services/public-view";
 import {
   type RegistrationError,
   register,
@@ -86,6 +87,9 @@ const guard = async (
   const { lineage, edition } = await context.params;
   const found = await getEdition(lineage, edition);
   if (!found) return errorResponse({ code: "not-found" });
+  // A new registration needs an edition this player can see; edits and withdrawals don't.
+  if (submit && !isVisible(found.edition, found.lineage, user.id))
+    return errorResponse({ code: "not-found" });
   return { user, edition: found.edition };
 };
 
