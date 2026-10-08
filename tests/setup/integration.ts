@@ -18,7 +18,11 @@ stubOsuAppEnv({ MONGODB_URI: inject("mongoUri") });
 vi.stubEnv("SKIP_ENV_VALIDATION", "");
 
 // revalidatePath and revalidateTag need Next's request store; tests assert the calls instead.
-vi.mock("next/cache", () => ({ revalidatePath: vi.fn(), revalidateTag: vi.fn() }));
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
+  unstable_cache: <T>(fn: T) => fn,
+}));
 
 // `after` needs Next's request scope too: its tasks are kept for tests to run (helpers/after.ts).
 vi.mock("next/server", async (importOriginal) => {

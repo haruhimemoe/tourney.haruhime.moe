@@ -4,7 +4,7 @@
  *       edition's pages by its cache tag, and the lists (home, /browse, the sitemap).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Thu Oct 8, 2026
  */
 
 import "server-only";
@@ -23,9 +23,11 @@ export const revalidateLists = (): void => {
 /**
  * @function revalidateEdition
  * @param editionId {string} the edition that changed
- * @returns {void} every cached read tagged with the edition id, and the lists, marked stale
+ * @returns {void} every cached read tagged with the edition id expired now (the next request
+ *          rebuilds it, so a hidden edition or a pulled pool never shows stale), and the lists
+ *          marked stale
  */
 export const revalidateEdition = (editionId: string): void => {
-  revalidateTag(editionId, "max");
+  revalidateTag(editionId, { expire: 0 });
   revalidateLists();
 };

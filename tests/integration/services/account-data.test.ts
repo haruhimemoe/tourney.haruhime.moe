@@ -10,7 +10,8 @@
  */
 
 import { ObjectId } from "mongodb";
-import { describe, expect, it } from "vitest";
+import { revalidateTag } from "next/cache";
+import { describe, expect, it, vi } from "vitest";
 import { collections } from "@/lib/collections";
 import { getDb } from "@/lib/db";
 import { deleteUser, exportUser } from "@/services/account-data";
@@ -78,6 +79,15 @@ describe("deleteUser", () => {
     expect((await deleteUser(player.id)).ok).toBe(true);
     expect(await db().registrations.countDocuments({ osuId: 2 })).toBe(0);
     expect((await db().teams.findOne({ _id: teamId }))?.roster).toEqual([3]);
+  });
+
+  it("marks the public pages of every edition it touched stale", async () => {
+    const { editionId } = await seedLineage();
+    const player = await createTestUser(2);
+    await register(editionId, player.id, 2);
+    vi.mocked(revalidateTag).mockClear();
+    expect((await deleteUser(player.id)).ok).toBe(true);
+    expect(vi.mocked(revalidateTag)).toHaveBeenCalledWith(editionId, expect.anything());
   });
 
   it("marks a solo team withdrawn when its only player leaves", async () => {

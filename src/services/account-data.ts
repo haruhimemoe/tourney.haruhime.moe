@@ -15,6 +15,7 @@
 import "server-only";
 import { collections, fromId } from "@/lib/collections";
 import { connectDb, getDb } from "@/lib/db";
+import { revalidateEdition } from "@/lib/revalidate";
 import { withdrawFromTeam } from "@/services/teams";
 import { type AppResult, fail, ok } from "@/utils/result";
 
@@ -90,5 +91,6 @@ export const deleteUser = async (userId: string): Promise<AppResult<{ deleted: n
     $pull: { members: { userId } },
     $set: { orphaned: true, updatedAt: new Date().toISOString() },
   });
+  for (const id of editionIds) revalidateEdition(id);
   return ok({ deleted });
 };
