@@ -8,6 +8,7 @@
 
 import type { Edition } from "@/schemas/edition";
 import type { Lineage } from "@/schemas/lineage";
+import type { StoredRegistration } from "@/schemas/registration";
 
 /** A fixed instant every record uses. */
 export const T0 = "2026-10-07T00:00:00.000Z";
@@ -61,5 +62,30 @@ export const makeEdition = (overrides: Partial<Edition> = {}): Edition => ({
   archived: false,
   createdAt: T0,
   updatedAt: T0,
+  ...overrides,
+});
+
+/**
+ * @function makeRegistration
+ * @param overrides {Partial<StoredRegistration>} fields to change
+ * @returns {StoredRegistration} a pending solo player registration for edition "e1", osu! id 1001
+ */
+export const makeRegistration = (
+  overrides: Partial<StoredRegistration> = {},
+): StoredRegistration => ({
+  id: "r1",
+  editionId: "e1",
+  userId: "u1001",
+  osuId: 1001,
+  kind: "player",
+  status: "pending",
+  appliedRoles: [],
+  approvedRoles: [],
+  availability: null,
+  answers: {},
+  snapshot: { rank: 5000, country: "US", username: "ranked", takenAt: T0 },
+  team: null,
+  reviewNote: null,
+  createdAt: T0,
   ...overrides,
 });

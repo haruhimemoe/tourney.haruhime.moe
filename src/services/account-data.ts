@@ -15,6 +15,7 @@
 import "server-only";
 import { collections, fromId } from "@/lib/collections";
 import { connectDb, getDb } from "@/lib/db";
+import { withdrawFromTeam } from "@/services/teams";
 import { type AppResult, fail, ok } from "@/utils/result";
 
 const ownerFilter = (userId: string) => ({
@@ -39,19 +40,6 @@ export const exportUser = async (userId: string): Promise<Record<string, unknown
     db.profiles.find({ userId }, { projection: { _id: 0 } }).toArray(),
   ]);
   return { lineages, editions, registrations, availability, profile };
-};
-
-/**
- * @function leaveTeams
- * @param editionId {string} a running edition
- * @param osuId {number} the player leaving
- * @returns {Promise<void>} once they're off every roster there; a team left empty is withdrawn
- */
-const leaveTeams = async (editionId: string, osuId: number): Promise<void> => {
-  const { teams } = collections(getDb());
-  await teams.updateMany({ editionId, roster: osuId }, { $pull: { roster: osuId, subs: osuId } });
-  await teams.updateMany({ editionId, subs: osuId }, { $pull: { subs: osuId } });
-  await teams.updateMany({ editionId, roster: { $size: 0 } }, { $set: { status: "withdrawn" } });
 };
 
 /**
@@ -89,7 +77,7 @@ export const deleteUser = async (userId: string): Promise<AppResult<{ deleted: n
       );
       continue;
     }
-    if (r.status === "approved") await leaveTeams(r.editionId, r.osuId);
+    if (r.status === "approved") await withdrawFromTeam(r.editionId, r.osuId);
     deleted += (await db.registrations.deleteOne({ _id: r._id })).deletedCount;
   }
   deleted += (await db.availability.deleteMany({ userId })).deletedCount;

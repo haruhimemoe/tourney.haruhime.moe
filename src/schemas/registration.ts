@@ -15,6 +15,7 @@ import { z } from "zod";
 export const SnapshotSchema = z.object({
   rank: z.number().int().positive().nullable(),
   country: z.string().length(2).nullable(),
+  username: z.string().min(1).max(32),
   takenAt: InstantSchema,
 });
 

@@ -39,7 +39,7 @@ const register = async (editionId: string, userId: string, osuId: number, status
     availability: null,
     createdAt: T0,
     answers: { discord: "me" },
-    snapshot: { rank: 100, country: "US", takenAt: T0 },
+    snapshot: { rank: 100, country: "US", username: "p", takenAt: T0 },
     team: null,
     reviewNote: null,
   });
