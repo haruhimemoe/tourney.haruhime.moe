@@ -2,7 +2,7 @@
  * @file src/constants/api.ts
  * @desc Rate limits, counted in rate_limits (src/lib/rate-limit.ts): per user on manage
  *       writes, and the osu! API budget (a global window and each caller's share). Later plans
- *       add registration and mp-fill limits here.
+ *       add more limits here.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Wed Oct 7, 2026
@@ -19,6 +19,8 @@ export const RATE_LIMITS = {
   registerIp: { scope: "register-ip", limit: 10, windowSeconds: 3600 },
   /** Registration submits per account. */
   registerUser: { scope: "register-user", limit: 5, windowSeconds: 3600 },
+  /** mp link fills (qualifier lobbies and matches), per account. */
+  mpFill: { scope: "mp-fill", limit: 20, windowSeconds: 3600 },
 } as const satisfies Record<string, RateLimitRule>;
 
 /** osu! API calls across every instance: 50 a minute. */

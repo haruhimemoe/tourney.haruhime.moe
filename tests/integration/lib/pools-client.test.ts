@@ -9,7 +9,7 @@
 
 import { slotKey } from "@haruhimemoe/pool";
 import { setupServer } from "msw/node";
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { getPool } from "@/lib/pools-client";
 import { POOL_SLOTS, POOLS_SECRET, poolsHandlers } from "../../helpers/pools-server";
 
@@ -17,7 +17,6 @@ const server = setupServer(...poolsHandlers);
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 afterAll(() => server.close());
 beforeEach(() => vi.stubEnv("TOURNEY_SERVICE_SECRET", POOLS_SECRET));
-afterEach(() => vi.unstubAllEnvs());
 
 describe("getPool", () => {
   it("reads a pool with each slot's key", async () => {

@@ -5,11 +5,11 @@
  *       so services and pages only see hex string ids.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Thu Oct 8, 2026
  */
 
 import "server-only";
-import { type Collection, type Db, type Document, ObjectId } from "mongodb";
+import { type Collection, type Db, ObjectId } from "mongodb";
 import {
   AVAILABILITY_COLLECTION,
   BRACKETS_COLLECTION,
@@ -28,6 +28,7 @@ import type { Edition } from "@/schemas/edition";
 import type { Lineage } from "@/schemas/lineage";
 import type { StoredMatch } from "@/schemas/match";
 import type { Profile } from "@/schemas/profile";
+import type { QualifierScore } from "@/schemas/qualifier-score";
 import type { StoredRegistration } from "@/schemas/registration";
 import type { StoredRound } from "@/schemas/round";
 import type { StoredTeam } from "@/schemas/team";
@@ -44,7 +45,7 @@ export type Collections = {
   teams: Collection<Doc<StoredTeam>>;
   brackets: Collection<Doc<StoredBracket>>;
   matches: Collection<Doc<StoredMatch>>;
-  qualifierScores: Collection<Document>;
+  qualifierScores: Collection<Doc<QualifierScore>>;
   availability: Collection<Doc<StoredAvailability>>;
   profiles: Collection<Profile>;
 };

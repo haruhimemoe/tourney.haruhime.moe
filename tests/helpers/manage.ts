@@ -8,9 +8,12 @@
  * @modified Wed Oct 7, 2026
  */
 
+import { ObjectId } from "mongodb";
 import type { ManageRoute } from "@/constants/manage-routes";
+import { collections, toId } from "@/lib/collections";
 import { getDb } from "@/lib/db";
 import type { Lineage } from "@/schemas/lineage";
+import type { StoredTeam } from "@/schemas/team";
 import { createEdition } from "@/services/editions";
 import { createLineage } from "@/services/lineages";
 import { createTestUser, type TestUser } from "./auth";
@@ -34,6 +37,12 @@ const MODULES: Record<string, () => Promise<Record<string, unknown>>> = {
     import("@/app/api/manage/[lineage]/[edition]/settings/route"),
   "/api/manage/[lineage]/[edition]/rounds": () =>
     import("@/app/api/manage/[lineage]/[edition]/rounds/route"),
+  "/api/manage/[lineage]/[edition]/qualifiers/scores": () =>
+    import("@/app/api/manage/[lineage]/[edition]/qualifiers/scores/route"),
+  "/api/manage/[lineage]/[edition]/qualifiers/fill": () =>
+    import("@/app/api/manage/[lineage]/[edition]/qualifiers/fill/route"),
+  "/api/manage/[lineage]/[edition]/seeds": () =>
+    import("@/app/api/manage/[lineage]/[edition]/seeds/route"),
 };
 
 /** A body each route parses, so a refusal can't come from the body. */
@@ -52,6 +61,11 @@ const BODIES: Record<string, unknown> = {
     eligibility: { rank: null, countries: null, regions: null },
   },
   "/api/manage/[lineage]/[edition]/rounds": { rounds: [] },
+  "/api/manage/[lineage]/[edition]/qualifiers/scores": { rows: [] },
+  "/api/manage/[lineage]/[edition]/qualifiers/fill": {
+    mpLink: "https://osu.ppy.sh/community/matches/1",
+  },
+  "/api/manage/[lineage]/[edition]/seeds": { method: "qualifiers" },
 };
 
 /**
@@ -117,4 +131,26 @@ export const snapshotCounts = async (): Promise<Record<string, number>> => {
   for (const name of names)
     if (name !== "rate_limits") counts[name] = await db.collection(name).countDocuments();
   return counts;
+};
+
+/**
+ * @function seedTeams
+ * @param editionId {string} the edition
+ * @param count {number} how many active 2-player teams
+ * @returns {Promise<StoredTeam[]>} "Team 1".."Team n", rosters [100i+1, 100i+2], oldest first
+ */
+export const seedTeams = async (editionId: string, count: number): Promise<StoredTeam[]> => {
+  const docs = Array.from({ length: count }, (_, i) => ({
+    _id: new ObjectId(),
+    editionId,
+    name: `Team ${i + 1}`,
+    tag: null,
+    captainId: 100 * (i + 1) + 1,
+    roster: [100 * (i + 1) + 1, 100 * (i + 1) + 2],
+    subs: [],
+    seed: null,
+    status: "active" as const,
+  }));
+  await collections(getDb()).teams.insertMany(docs);
+  return docs.map(toId);
 };
