@@ -2,7 +2,7 @@
  * @file src/app/llms-full.txt/route.ts
  * @desc GET /llms-full.txt: one Markdown file for AI assistants, from next-kit's contentLlmsFull:
  *       the llms.txt notes, every docs and legal page from the content registry, then the public
- *       tournaments and the other haruhime.moe tools. Rebuilt hourly.
+ *       tournaments and the other haruhime.moe tools. Built on request, cached an hour by the CDN.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
  * @modified Thu Oct 8, 2026
@@ -18,8 +18,8 @@ import { listPublicEditions } from "@/services/public-view";
 import { CONTENT_MARKDOWN, LEGAL_CONTENT_MARKDOWN } from "@/utils/content-markdown";
 import { LLMS_EDITION_LIMIT, LLMS_NOTES, llmsListsMarkdown } from "@/utils/llms-txt";
 
-/** Rebuilt once an hour. */
-export const revalidate = 3600;
+/** Read from the database on request (the build has none); CDNs cache it for an hour. */
+export const dynamic = "force-dynamic";
 
 /**
  * @function GET
