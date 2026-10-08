@@ -30,6 +30,7 @@ const EXCEPTIONS: Record<string, string> = {
     "qualifier scores are not on public pages",
   "src/app/api/internal/account/[op]/route.ts": "deleteUser revalidates the editions it touches",
   "src/app/api/availability/route.ts": "availability is on no public page",
+  "src/app/api/admin/hosts/route.ts": "the verified flag is on no public page",
 };
 
 const WRITES = /export (const|async function) (PUT|POST|PATCH|DELETE)\b/;
