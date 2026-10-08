@@ -172,3 +172,16 @@ export const withdrawFromTeam = async (editionId: string, osuId: number): Promis
   const status = below ? ("withdrawn" as const) : doc.status;
   await col.updateOne({ _id: doc._id }, { $set: { roster, subs, captainId, status } });
 };
+
+/**
+ * @function withdrawTeam
+ * @param editionId {string} the edition
+ * @param captainId {number} the captain whose registration was withdrawn
+ * @returns {Promise<void>} once their active team is withdrawn
+ */
+export const withdrawTeam = async (editionId: string, captainId: number): Promise<void> => {
+  await (await teams()).updateOne(
+    { editionId, captainId, status: "active" },
+    { $set: { status: "withdrawn" } },
+  );
+};

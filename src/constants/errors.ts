@@ -19,7 +19,10 @@ export type AppErrorCode =
   | "owns-active-edition"
   | "osu-user-unavailable"
   | "osu-unavailable"
-  | "team-name-taken";
+  | "team-name-taken"
+  | "already-registered"
+  | "ineligible"
+  | "player-on-team";
 
 /** Every error code a service can return. */
 export type ErrorCode = TourneyErrorCode | AppErrorCode;
@@ -42,6 +45,9 @@ export const ERROR_MESSAGES = {
   forbidden: "You can't change this tournament.",
   "owns-active-edition":
     "You own a lineage with an edition still running. Finish it or transfer the lineage first.",
+  "already-registered": "You're already registered for this edition.",
+  ineligible: "You don't meet this edition's eligibility rules.",
+  "player-on-team": "A player you listed is already on another team in this edition.",
   "team-name-taken": "Another team in this edition already has that name.",
   "osu-user-unavailable": "osu! has no account by that id. It may be restricted or deleted.",
   "osu-unavailable":
@@ -66,6 +72,8 @@ const STATUS: Partial<Record<ErrorCode, number>> = {
   "edition-limit": 409,
   "osu-unavailable": 503,
   "team-name-taken": 409,
+  "already-registered": 409,
+  "player-on-team": 409,
 };
 
 /**
