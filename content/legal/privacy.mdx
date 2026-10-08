@@ -1,0 +1,43 @@
+This page says what tourney.haruhime.moe stores, why, and for how long.
+
+## If you visit
+
+We set no cookies unless you sign in, and run no analytics. To stop floods, we count some requests per IP address (an IPv6 address by its /64) in counters that are deleted automatically within about an hour.
+
+Avatars load in your browser straight from osu!'s servers (a.ppy.sh), so osu! sees your IP address when they load.
+
+## If you sign in
+
+Sign-in happens on [haruhime.moe](https://www.haruhime.moe), the account every haruhime tool shares: it stores your osu! user ID, username, avatar URL and country, the link to osu! (never osu! tokens) and your sessions, and its own privacy page covers them. tourney only reads that account and session to know who you are, and writes nothing to it.
+
+haruhime.moe sets the session cookie on `.haruhime.moe`, so tourney can read it, along with `haruhime-signed-in`, which pages can read. tourney sets neither cookie.
+
+## Hosting a tournament
+
+A lineage (a tournament series) keeps its name, description, its owner and the admins the owner adds, by haruhime account ID. An edition keeps its settings, rules text, rounds, teams, bracket, schedule and results. Editions are public once they open registration, unless the host hides them.
+
+## Registering for a tournament
+
+A registration keeps your haruhime account ID, osu! ID, the answers you give to the host's questions, and a snapshot of your osu! rank and country taken when you register, which we look up on the osu! API and never refresh. Your team, your availability (weekly times and your time zone) and your match results are kept with the edition. The host and admins of that tournament see your answers; the public page shows your osu! username, team and results.
+
+## Deleting
+
+Deleting your haruhime account on [haruhime.moe/account](https://www.haruhime.moe/account) deletes your tourney data too: your registrations, availability and profile. Registrations in finished tournaments keep only your osu! ID, so past brackets stay whole. Registrations in running tournaments are withdrawn. Lineages you own whose editions are all finished stay up without an owner. You can't delete your account while you own a lineage with a running edition: finish it or hand the lineage to someone else first.
+
+## What we never do
+
+We don't sell or share any of this.
+
+## Requests our server makes
+
+The [disclaimers](/legal/disclaimers) page lists them.
+
+## Who processes this for us
+
+<Processors />
+
+## Your rights
+
+[Your Privacy Rights](/legal/your-privacy-rights) says more about the GDPR and the CCPA.
+
+<LegalContact />

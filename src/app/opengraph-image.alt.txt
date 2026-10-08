@@ -1,0 +1,1 @@
+tourney: osu! tournaments, run in one place
