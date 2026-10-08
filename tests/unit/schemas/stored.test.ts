@@ -93,7 +93,8 @@ describe("stored schemas", () => {
       false,
     );
     expect(
-      StoredRegistrationSchema.safeParse({ ...makeRegistration(), snapshot: null }).success,
+      StoredRegistrationSchema.safeParse({ ...makeRegistration(), snapshot: { username: "" } })
+        .success,
     ).toBe(false);
   });
 });
