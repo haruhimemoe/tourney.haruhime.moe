@@ -45,6 +45,10 @@ const MODULES: Record<string, () => Promise<Record<string, unknown>>> = {
     import("@/app/api/manage/[lineage]/[edition]/seeds/route"),
   "/api/manage/[lineage]/[edition]/bracket": () =>
     import("@/app/api/manage/[lineage]/[edition]/bracket/route"),
+  "/api/manage/[lineage]/[edition]/matches/[code]/time": () =>
+    import("@/app/api/manage/[lineage]/[edition]/matches/[code]/time/route"),
+  "/api/manage/[lineage]/[edition]/schedule/suggest": () =>
+    import("@/app/api/manage/[lineage]/[edition]/schedule/suggest/route"),
 };
 
 /** A body each route parses, so a refusal can't come from the body. */
@@ -68,6 +72,8 @@ const BODIES: Record<string, unknown> = {
     mpLink: "https://osu.ppy.sh/community/matches/1",
   },
   "/api/manage/[lineage]/[edition]/seeds": { method: "qualifiers" },
+  "/api/manage/[lineage]/[edition]/matches/[code]/time": { at: null },
+  "/api/manage/[lineage]/[edition]/schedule/suggest": { round: "SF" },
 };
 
 /**
@@ -100,7 +106,7 @@ export const callRoute = async (
   route: ManageRoute,
   lineage: string,
   cookie: string | null,
-  segments: Record<string, string> = { edition: "egc2026" },
+  segments: Record<string, string> = { edition: "egc2026", code: "M1" },
 ): Promise<Response> => {
   const load = MODULES[route.path];
   if (!load) throw new Error(`No module for ${route.path}`);

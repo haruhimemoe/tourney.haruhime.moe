@@ -31,4 +31,6 @@ export const MANAGE_ROUTES: readonly ManageRoute[] = [
   { path: "/api/manage/[lineage]/[edition]/qualifiers/fill", method: "POST", need: "admin" },
   { path: "/api/manage/[lineage]/[edition]/seeds", method: "PUT", need: "admin" },
   { path: "/api/manage/[lineage]/[edition]/bracket", method: "POST", need: "admin" },
+  { path: "/api/manage/[lineage]/[edition]/matches/[code]/time", method: "PUT", need: "admin" },
+  { path: "/api/manage/[lineage]/[edition]/schedule/suggest", method: "POST", need: "admin" },
 ];

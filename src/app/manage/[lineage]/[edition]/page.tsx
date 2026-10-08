@@ -72,6 +72,7 @@ export default async function ManageEditionPage({ params }: Props) {
         <TextLink href={`/manage/${lineage.slug}/${edition.slug}/qualifiers`}>
           Qualifiers and seeds
         </TextLink>
+        <TextLink href={`/manage/${lineage.slug}/${edition.slug}/schedule`}>Schedule</TextLink>
       </nav>
       <SetupChecklist items={setupChecklist(edition, await listRounds(edition.id))} />
     </div>

@@ -26,7 +26,8 @@ export type AppErrorCode =
   | "pool-unavailable"
   | "seeds-missing"
   | "bracket-has-results"
-  | "conflict";
+  | "conflict"
+  | "outside-window";
 
 /** Every error code a service can return. */
 export type ErrorCode = TourneyErrorCode | AppErrorCode;
@@ -61,6 +62,7 @@ export const ERROR_MESSAGES = {
   "seeds-missing": "Every team needs a seed before the bracket can be made.",
   "bracket-has-results": "The bracket already has results. Undo them before making it again.",
   conflict: "Someone else saved at the same moment. Reload and try again.",
+  "outside-window": "That time is outside the round's window.",
 } as const satisfies Record<ErrorCode, string>;
 
 const FALLBACK = "Something went wrong. Try again.";
