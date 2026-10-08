@@ -109,6 +109,13 @@ export const getAdminOsuIds = (): ReadonlySet<number> => readIdSet(ADMIN_OSU_IDS
  */
 export const getHubUrl = (): string => readOrigin(HUB_URL_KEY, DEFAULT_HUB_URL);
 
+/**
+ * @function getPoolsUrl
+ * @returns {string} POOLS_URL read now (an origin), or pools.haruhime.moe when it's unset
+ * @throws {EnvError} naming POOLS_URL when it isn't an https origin (http only on localhost)
+ */
+export const getPoolsUrl = (): string => readOrigin(POOLS_URL_KEY, DEFAULT_POOLS_URL);
+
 /** pools' internal pool route: its origin and the shared secret. */
 export type PoolsService = { url: string; secret: string };
 
@@ -120,7 +127,7 @@ export type PoolsService = { url: string; secret: string };
  *         TOURNEY_SERVICE_SECRET when it's shorter than 32 characters
  */
 export const getPoolsService = (): PoolsService | null => {
-  const url = readOrigin(POOLS_URL_KEY, DEFAULT_POOLS_URL);
+  const url = getPoolsUrl();
   const secret = optionalSecret(TOURNEY_SERVICE_SECRET_KEY, 32);
   return secret === undefined ? null : { url, secret };
 };

@@ -11,8 +11,8 @@ import { PageHeader } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { RoundsEditor } from "@/components/manage/RoundsEditor";
-import { poolsUrl } from "@/constants/pools";
 import { SEO_SITE } from "@/constants/seo";
+import { getPoolsUrl } from "@/env";
 import { requireUser } from "@/lib/auth-session";
 import { getEdition } from "@/services/editions";
 import { memberRole } from "@/services/lineages";
@@ -54,7 +54,7 @@ export default async function RoundsPage({ params }: Props) {
         config={edition.bracket}
         qualifiers={edition.qualifiers}
         rounds={await listRounds(edition.id)}
-        poolsUrl={poolsUrl()}
+        poolsUrl={getPoolsUrl()}
       />
     </div>
   );

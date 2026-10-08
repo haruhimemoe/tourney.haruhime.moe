@@ -5,7 +5,7 @@
  *       without a message a type error.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Thu Oct 8, 2026
  */
 
 import type { TourneyErrorCode } from "@haruhimemoe/tourney";
@@ -22,7 +22,8 @@ export type AppErrorCode =
   | "team-name-taken"
   | "already-registered"
   | "ineligible"
-  | "player-on-team";
+  | "player-on-team"
+  | "pool-unavailable";
 
 /** Every error code a service can return. */
 export type ErrorCode = TourneyErrorCode | AppErrorCode;
@@ -52,6 +53,8 @@ export const ERROR_MESSAGES = {
   "osu-user-unavailable": "osu! has no account by that id. It may be restricted or deleted.",
   "osu-unavailable":
     "osu! isn't answering right now. Nothing was saved. Try again in a few minutes.",
+  "pool-unavailable":
+    "pools.haruhime.moe isn't answering for this pool right now. You can still enter results by hand.",
 } as const satisfies Record<ErrorCode, string>;
 
 const FALLBACK = "Something went wrong. Try again.";
@@ -71,6 +74,7 @@ const STATUS: Partial<Record<ErrorCode, number>> = {
   "slug-taken": 409,
   "edition-limit": 409,
   "osu-unavailable": 503,
+  "pool-unavailable": 503,
   "team-name-taken": 409,
   "already-registered": 409,
   "player-on-team": 409,
