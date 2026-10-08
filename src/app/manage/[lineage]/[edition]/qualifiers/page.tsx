@@ -12,11 +12,13 @@ import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { Notice, PageHeader, SectionHeading } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { GenerateBracketButton } from "@/components/manage/GenerateBracketButton";
 import { QualifierScores } from "@/components/manage/QualifierScores";
 import { SeedList } from "@/components/manage/SeedList";
 import { SEO_SITE } from "@/constants/seo";
 import { requireUser } from "@/lib/auth-session";
 import { getPool } from "@/lib/pools-client";
+import { getBracket } from "@/services/brackets";
 import { getEdition } from "@/services/editions";
 import { memberRole } from "@/services/lineages";
 import { listQualifierScores } from "@/services/qualifiers";
@@ -86,6 +88,14 @@ export default async function QualifiersPage({ params }: Props) {
           teams={teams.map((t) => ({ id: t.id, name: t.name, seed: t.seed }))}
           qualifiers={edition.qualifiers.enabled && Boolean(round)}
           randomSeed={edition.bracket?.randomSeed ?? null}
+        />
+      </section>
+      <section className="flex flex-col gap-4">
+        <SectionHeading>Bracket</SectionHeading>
+        <GenerateBracketButton
+          lineage={lineage.slug}
+          edition={edition.slug}
+          exists={Boolean((await getBracket(edition.id))?.bracket)}
         />
       </section>
     </div>

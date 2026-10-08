@@ -43,6 +43,8 @@ const MODULES: Record<string, () => Promise<Record<string, unknown>>> = {
     import("@/app/api/manage/[lineage]/[edition]/qualifiers/fill/route"),
   "/api/manage/[lineage]/[edition]/seeds": () =>
     import("@/app/api/manage/[lineage]/[edition]/seeds/route"),
+  "/api/manage/[lineage]/[edition]/bracket": () =>
+    import("@/app/api/manage/[lineage]/[edition]/bracket/route"),
 };
 
 /** A body each route parses, so a refusal can't come from the body. */

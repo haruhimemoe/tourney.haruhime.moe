@@ -23,7 +23,10 @@ export type AppErrorCode =
   | "already-registered"
   | "ineligible"
   | "player-on-team"
-  | "pool-unavailable";
+  | "pool-unavailable"
+  | "seeds-missing"
+  | "bracket-has-results"
+  | "conflict";
 
 /** Every error code a service can return. */
 export type ErrorCode = TourneyErrorCode | AppErrorCode;
@@ -55,6 +58,9 @@ export const ERROR_MESSAGES = {
     "osu! isn't answering right now. Nothing was saved. Try again in a few minutes.",
   "pool-unavailable":
     "pools.haruhime.moe isn't answering for this pool right now. You can still enter results by hand.",
+  "seeds-missing": "Every team needs a seed before the bracket can be made.",
+  "bracket-has-results": "The bracket already has results. Undo them before making it again.",
+  conflict: "Someone else saved at the same moment. Reload and try again.",
 } as const satisfies Record<ErrorCode, string>;
 
 const FALLBACK = "Something went wrong. Try again.";
@@ -75,6 +81,8 @@ const STATUS: Partial<Record<ErrorCode, number>> = {
   "edition-limit": 409,
   "osu-unavailable": 503,
   "pool-unavailable": 503,
+  "bracket-has-results": 409,
+  conflict: 409,
   "team-name-taken": 409,
   "already-registered": 409,
   "player-on-team": 409,
