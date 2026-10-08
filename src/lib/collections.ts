@@ -22,6 +22,7 @@ import {
   ROUNDS_COLLECTION,
   TEAMS_COLLECTION,
 } from "@/constants/db";
+import type { StoredAvailability } from "@/schemas/availability";
 import type { StoredBracket } from "@/schemas/bracket";
 import type { Edition } from "@/schemas/edition";
 import type { Lineage } from "@/schemas/lineage";
@@ -44,7 +45,7 @@ export type Collections = {
   brackets: Collection<Doc<StoredBracket>>;
   matches: Collection<Doc<StoredMatch>>;
   qualifierScores: Collection<Document>;
-  availability: Collection<Document>;
+  availability: Collection<Doc<StoredAvailability>>;
   profiles: Collection<Profile>;
 };
 
