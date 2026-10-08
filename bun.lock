@@ -12,7 +12,7 @@
         "@haruhimemoe/pool": "0.3.0",
         "@haruhimemoe/time": "0.1.0",
         "@haruhimemoe/tourney": "0.2.0",
-        "@haruhimemoe/ui": "0.21.0",
+        "@haruhimemoe/ui": "0.22.0",
         "@haruhimemoe/vcs": "0.1.0",
         "@mdx-js/loader": "3.1.1",
         "@mdx-js/react": "3.1.1",
@@ -140,7 +140,7 @@
 
     "@haruhimemoe/tourney": ["@haruhimemoe/tourney@0.2.0", "", { "peerDependencies": { "@haruhimemoe/osu": "^0.5.0", "@haruhimemoe/pool": "^0.3.0", "@haruhimemoe/time": "^0.1.0", "zod": "^4.0.16" }, "optionalPeers": ["@haruhimemoe/osu"] }, "sha512-A96EtzTY9WAr307WyJmyPq98BhNsugUT+nKSSpHpGNi6N+xJBMWwlEw6tGG+jj1WhpDziBL0HS/gM01YRpMzhQ=="],
 
-    "@haruhimemoe/ui": ["@haruhimemoe/ui@0.21.0", "", { "dependencies": { "tailwind-merge": "3.7.0" }, "peerDependencies": { "next": ">=16.0.0 <17", "react": ">=19.0.0", "react-dom": ">=19.0.0", "shiki": ">=4.5.0 <5", "tailwindcss": ">=4.1.0 <5" }, "optionalPeers": ["shiki"] }, "sha512-sOYM7YNflNmUDlDIHEiNyocDZG3EdiKhjEU99pDxdwv3FRyUpe9BA0Oyd2tv0fr/eF/QI2zzlcoebepMBlQRhw=="],
+    "@haruhimemoe/ui": ["@haruhimemoe/ui@0.22.0", "", { "dependencies": { "tailwind-merge": "3.7.0" }, "peerDependencies": { "next": ">=16.0.0 <17", "react": ">=19.0.0", "react-dom": ">=19.0.0", "shiki": ">=4.5.0 <5", "tailwindcss": ">=4.1.0 <5" }, "optionalPeers": ["shiki"] }, "sha512-gfj1XzgZR6EePgWoawJYNBV9azV2QbLbpm+YKN9KoZzEvn9oqEprMKjHF8c623BSMyDsM8Ct2pRRJ27YhXUKIA=="],
 
     "@haruhimemoe/vcs": ["@haruhimemoe/vcs@0.1.0", "", {}, "sha512-Zsas46sJyFv7EoWxYg5PHgYzN5sGm/LW9YmwTs5EXt7c3rwbelZLhOPpsiXijlUHYfS6Z71L69Egs/XBZD2YKA=="],
 
