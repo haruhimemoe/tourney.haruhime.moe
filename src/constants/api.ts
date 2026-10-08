@@ -15,6 +15,10 @@ export type RateLimitRule = { scope: string; limit: number; windowSeconds: numbe
 export const RATE_LIMITS = {
   /** Every /api/manage write, per user. */
   manageWrite: { scope: "manage-write", limit: 120, windowSeconds: 60 },
+  /** Registration submits per IP (an IPv6 address by its /64), signed in or not. */
+  registerIp: { scope: "register-ip", limit: 10, windowSeconds: 3600 },
+  /** Registration submits per account. */
+  registerUser: { scope: "register-user", limit: 5, windowSeconds: 3600 },
 } as const satisfies Record<string, RateLimitRule>;
 
 /** osu! API calls across every instance: 50 a minute. */

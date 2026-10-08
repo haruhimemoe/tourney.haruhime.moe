@@ -10,8 +10,10 @@
 
 import { errorMessage } from "@/constants/errors";
 
-/** A manage route's answer: its JSON, or the message to show. */
-export type PostResult<T> = { ok: true; data: T } | { ok: false; message: string };
+/** A route's answer: its JSON, or the message to show with the code and the error's other fields. */
+export type PostResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; message: string; code?: string; error?: Record<string, unknown> };
 
 /**
  * @function postJson
@@ -32,13 +34,15 @@ export const postJson = async <T>(
       body: JSON.stringify(body),
     });
     const data = (await response.json().catch(() => null)) as
-      | (T & { error?: { code?: string; message?: string } })
+      | (T & { error?: { code?: string; message?: string } & Record<string, unknown> })
       | null;
     if (response.ok && data) return { ok: true, data };
     const code = data?.error?.code;
     return {
       ok: false,
       message: code ? errorMessage(code) : (data?.error?.message ?? errorMessage("")),
+      ...(code ? { code } : {}),
+      ...(data?.error ? { error: data.error } : {}),
     };
   } catch {
     return { ok: false, message: "Couldn't reach tourney. Check your connection and try again." };

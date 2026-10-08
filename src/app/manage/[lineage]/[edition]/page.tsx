@@ -8,7 +8,7 @@
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
-import { PageHeader } from "@haruhimemoe/ui";
+import { PageHeader, TextLink } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PhaseButton } from "@/components/manage/PhaseButton";
@@ -59,6 +59,14 @@ export default async function ManageEditionPage({ params }: Props) {
           next ? <PhaseButton lineage={lineage.slug} edition={edition.slug} to={next} /> : null
         }
       />
+      <nav aria-label="Edition pages" className="flex gap-4 text-sm">
+        <TextLink href={`/manage/${lineage.slug}/${edition.slug}/registrations`}>
+          Registrations
+        </TextLink>
+        <TextLink href={`/manage/${lineage.slug}/${edition.slug}/settings/registration`}>
+          Registration settings
+        </TextLink>
+      </nav>
       <SetupChecklist items={setupChecklist(edition, await listRounds(edition.id))} />
     </div>
   );

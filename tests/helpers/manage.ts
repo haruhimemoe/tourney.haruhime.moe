@@ -28,6 +28,10 @@ const MODULES: Record<string, () => Promise<Record<string, unknown>>> = {
   "/api/manage/[lineage]/editions": () => import("@/app/api/manage/[lineage]/editions/route"),
   "/api/manage/[lineage]/[edition]/phase": () =>
     import("@/app/api/manage/[lineage]/[edition]/phase/route"),
+  "/api/manage/[lineage]/[edition]/registrations/review": () =>
+    import("@/app/api/manage/[lineage]/[edition]/registrations/review/route"),
+  "/api/manage/[lineage]/[edition]/settings": () =>
+    import("@/app/api/manage/[lineage]/[edition]/settings/route"),
 };
 
 /** A body each route parses, so a refusal can't come from the body. */
@@ -41,6 +45,10 @@ const BODIES: Record<string, unknown> = {
   "/api/manage/[lineage]/admins": { add: 2 },
   "/api/manage/[lineage]/editions": { ...EDITION_INPUT, code: "EGC2027" },
   "/api/manage/[lineage]/[edition]/phase": { to: "registration" },
+  "/api/manage/[lineage]/[edition]/registrations/review": { ids: ["0".repeat(24)], to: "approved" },
+  "/api/manage/[lineage]/[edition]/settings": {
+    eligibility: { rank: null, countries: null, regions: null },
+  },
 };
 
 /**
