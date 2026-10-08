@@ -51,11 +51,29 @@ const FALLBACK = "Something went wrong. Try again.";
 export const errorMessage = (code: string): string =>
   (ERROR_MESSAGES as Record<string, string>)[code] ?? FALLBACK;
 
+/** HTTP status per code; everything else is 422. */
+const STATUS: Partial<Record<ErrorCode, number>> = {
+  "not-found": 404,
+  forbidden: 403,
+  "slug-taken": 409,
+  "edition-limit": 409,
+};
+
+/**
+ * @function errorStatus
+ * @param code {string} an error code
+ * @returns {number} the HTTP status a route answers it with
+ */
+export const errorStatus = (code: string): number => STATUS[code as ErrorCode] ?? 422;
+
 /**
  * @function errorResponse
  * @param error {{ code: string }} the error
- * @param status {number} HTTP status, 422 by default
+ * @param status {number} HTTP status, errorStatus's by default
  * @returns {Response} JSON `{ error: { code, message } }`
  */
-export const errorResponse = (error: { code: string }, status = 422): Response =>
+export const errorResponse = (
+  error: { code: string },
+  status = errorStatus(error.code),
+): Response =>
   Response.json({ error: { code: error.code, message: errorMessage(error.code) } }, { status });

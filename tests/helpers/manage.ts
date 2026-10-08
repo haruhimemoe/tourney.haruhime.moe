@@ -23,12 +23,24 @@ type Handler = (
 
 /** Each manage route's module, by path pattern. */
 const MODULES: Record<string, () => Promise<Record<string, unknown>>> = {
+  "/api/manage/lineages": () => import("@/app/api/manage/lineages/route"),
   "/api/manage/[lineage]/admins": () => import("@/app/api/manage/[lineage]/admins/route"),
+  "/api/manage/[lineage]/editions": () => import("@/app/api/manage/[lineage]/editions/route"),
+  "/api/manage/[lineage]/[edition]/phase": () =>
+    import("@/app/api/manage/[lineage]/[edition]/phase/route"),
 };
 
 /** A body each route parses, so a refusal can't come from the body. */
 const BODIES: Record<string, unknown> = {
+  "/api/manage/lineages": {
+    slug: "other-cup",
+    name: "Other Cup",
+    description: "",
+    defaults: LINEAGE_INPUT.defaults,
+  },
   "/api/manage/[lineage]/admins": { add: 2 },
+  "/api/manage/[lineage]/editions": { ...EDITION_INPUT, code: "EGC2027" },
+  "/api/manage/[lineage]/[edition]/phase": { to: "registration" },
 };
 
 /**

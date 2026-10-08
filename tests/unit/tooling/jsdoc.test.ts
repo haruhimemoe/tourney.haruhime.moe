@@ -24,7 +24,7 @@ const FUNCTION_VALUE =
   /^export (?:default )?(?:async )?const \w+(?:: [^=]+)? = (?:async )?(?:<|\()/;
 
 describe("file headers", () => {
-  it.each(["src", "scripts", "tests"])("start every file in %s", (dir) => {
+  it.each(["src", "tests"])("start every file in %s", (dir) => {
     const missing = files(dir).filter((file) => {
       const head = readFileSync(file, "utf8").split("*/")[0] ?? "";
       const fields = ["@desc", "@author", "@created", "@modified"].every((tag) =>

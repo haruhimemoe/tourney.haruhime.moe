@@ -85,6 +85,19 @@ export const getLineage = async (id: string): Promise<Lineage | null> => {
 };
 
 /**
+ * @function listMemberLineages
+ * @param userId {string} an account
+ * @returns {Promise<Lineage[]>} the lineages they own or help run, by name
+ */
+export const listMemberLineages = async (userId: string): Promise<Lineage[]> => {
+  const docs = await (await lineages())
+    .find({ "members.userId": userId })
+    .sort({ name: 1 })
+    .toArray();
+  return docs.map(toId);
+};
+
+/**
  * @function memberRole
  * @param lineage {Lineage} the lineage
  * @param userId {string} an account
