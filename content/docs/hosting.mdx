@@ -2,8 +2,56 @@ tourney runs an osu! tournament in one place: registration, teams, qualifiers, t
 
 ## Start
 
-Sign in with osu!, then pick **Host a tournament**. Make a lineage (the series, like "Evergreen Cup") and its first edition (one year of it). Each account can run one edition at a time; ask on the Discord server to raise that.
+Sign in with osu!, then pick **Host a tournament**. Make a lineage (the series, like "Evergreen Cup") and its first edition (one year of it). Each account can run one edition at a time. Ask on the Discord server to become a verified host, which raises that to 10.
 
-## Setup
+The lineage owner can add admins by osu! ID. Admins can change every edition of the lineage; only the owner can hand the lineage to someone else.
 
-A new edition starts in setup. Its checklist shows what's missing before registration can open.
+## Phases
+
+An edition moves forward through its phases and can skip the ones it doesn't use:
+
+1. **Setup.** Its checklist shows what's missing before registration can open.
+2. **Registration.** Players (or team captains) register between the opening and closing times you set.
+3. **Qualifiers**, if the edition has them.
+4. **Bracket.** The main bracket is played.
+5. **Done.**
+
+## Who sees the edition
+
+The edition's settings have a **site** option:
+
+- **Auto** shows the public page once the edition leaves setup.
+- **Hidden** shows it only to the lineage's owner and admins. Everyone else gets "not found".
+- **Live** shows it right away, even in setup.
+
+A change shows on the next page load.
+
+## Registration
+
+Add your own questions to the form (text, long text, a number, a link, a checkbox, one choice or several), and limit who may register by rank, country or region. Each registration keeps a snapshot of the player's osu! username, rank and country from the moment they registered; it never refreshes.
+
+On the registrations page, approve, waitlist or reject players, up to 200 at once. Approving a solo player or a team's captain makes their team.
+
+## Rounds and pools
+
+Set the bracket's size and format (single or double elimination, a third place match, a grand final reset) and the rounds follow. For each round you can set its name, best of, a window for match times, and its pool from [pools.haruhime.moe](https://pools.haruhime.moe).
+
+A round's pool stays off the public page until you tick **revealed**. That only hides tourney's link: whether the pool itself is public is set on pools.haruhime.moe.
+
+## Qualifiers and seeding
+
+Type qualifier scores in, or fill them from a lobby's mp link (you see a preview first and save it yourself). Then seed from the qualifiers, at random from a seed number, or by hand, and make the bracket.
+
+The bracket can be made again until the first result is saved.
+
+## Schedule
+
+Set each match's time by hand, or ask for suggestions: tourney looks at both teams' availability inside the round's window and the higher seed's players break ties. **Fill round** gives every untimed match in a round its best suggestion. Times are stored in UTC and everyone sees them in their own time zone.
+
+## Results
+
+See [Entering results](/docs/results).
+
+## Your dashboard
+
+The home page lists every lineage you run, with what needs you in each edition: registrations to review, matches without a time, and results overdue.

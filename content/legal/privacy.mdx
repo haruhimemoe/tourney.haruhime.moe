@@ -2,7 +2,7 @@ This page says what tourney.haruhime.moe stores, why, and for how long.
 
 ## If you visit
 
-We set no cookies unless you sign in, and run no analytics. To stop floods, we count some requests per IP address (an IPv6 address by its /64) in counters that are deleted automatically within about an hour. Registration submits are counted the same way, per IP address (10 an hour) and per account (5 an hour), and a host's mp link fills per account (20 an hour).
+We set no cookies unless you sign in, and run no analytics. To stop floods, we count some requests per IP address (an IPv6 address by its /64) in counters that are deleted automatically within about an hour. Registration submits are counted the same way, per IP address (10 an hour) and per account (5 an hour), a host's mp link fills per account (20 an hour), every change a signed-in account makes (120 a minute), and calls to the osu! API per account.
 
 Avatars load in your browser straight from osu!'s servers (a.ppy.sh), so osu! sees your IP address when they load.
 
@@ -18,7 +18,11 @@ A lineage (a tournament series) keeps its name, description, its owner and the a
 
 ## Registering for a tournament
 
-A registration keeps your haruhime account ID, osu! ID, the answers you give to the host's questions, and a snapshot of your osu! username, rank and country taken when you register, which we look up on the osu! API and never refresh. Your team, your availability (weekly times and your time zone) and your match results are kept with the edition. The host and admins of that tournament see your answers; the public page shows your osu! username, team and results.
+A registration keeps your haruhime account ID, osu! ID, the answers you give to the host's questions, and a snapshot of your osu! username, rank and country taken when you register, which we look up on the osu! API and never refresh. Your team, your availability (weekly times and your time zone, for each tournament and a default) and your match results are kept with the edition. The host and admins of that tournament see your answers; the public page shows your osu! username, team and results.
+
+## Your profile
+
+tourney keeps a small profile per account: your time zone, if you set one, and whether a haruhime admin marked you a verified host.
 
 ## Deleting
 

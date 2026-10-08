@@ -12,7 +12,7 @@ import { describe, expect, it } from "vitest";
 import { collections } from "@/lib/collections";
 import { getDb } from "@/lib/db";
 import { moveEditionPhase, updateEdition } from "@/services/editions";
-import { publicEdition } from "@/services/public-view";
+import { listPublicEditions, publicEdition } from "@/services/public-view";
 import { syncRounds, updateRound } from "@/services/rounds";
 import { setupTestDb } from "../../helpers/db";
 import { seedLineage, seedTeams } from "../../helpers/manage";
@@ -105,5 +105,16 @@ describe("publicEdition", () => {
     const { lineage } = await setup();
     expect(await publicEdition(lineage.slug, "nope", null)).toBeNull();
     expect(await publicEdition("nope", "egc2026", null)).toBeNull();
+  });
+});
+
+describe("listPublicEditions", () => {
+  it("lists editions past setup and live ones, never hidden ones", async () => {
+    const { editionId } = await setup();
+    expect(await listPublicEditions(10)).toEqual([]);
+    await moveEditionPhase(editionId, "registration");
+    expect((await listPublicEditions(10)).map((e) => e.slug)).toEqual(["egc2026"]);
+    await updateEdition(editionId, { siteMode: "hidden" });
+    expect(await listPublicEditions(10)).toEqual([]);
   });
 });

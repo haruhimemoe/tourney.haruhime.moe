@@ -22,7 +22,21 @@ export const CONTENT = defineContent({
       title: "Hosting a tournament",
       description:
         "How to host an osu! tournament on tourney.haruhime.moe: sign in, make a lineage and its first edition, then work through the setup checklist to open registration.",
-      lastUpdated: "2026-10-07",
+      lastUpdated: "2026-10-08",
+    },
+    {
+      slug: "playing",
+      title: "Playing in a tournament",
+      description:
+        "How to play in an osu! tournament on tourney.haruhime.moe: register, set when you're free, and find your team, your next match and its pool.",
+      lastUpdated: "2026-10-08",
+    },
+    {
+      slug: "results",
+      title: "Entering results",
+      description:
+        "How hosts enter match results on tourney.haruhime.moe: typing a score, reading an osu! mp link, the problems a fill can find, forfeits and undo.",
+      lastUpdated: "2026-10-08",
     },
   ],
   legal: legalEntries(LEGAL_SITE, {
@@ -36,7 +50,7 @@ export const CONTENT = defineContent({
       title: "Privacy",
       description:
         "What tourney.haruhime.moe stores when you visit, sign in with osu!, host or register for a tournament, why, and for how long. No analytics, no cookies unless you sign in.",
-      lastUpdated: "2026-10-07",
+      lastUpdated: "2026-10-08",
     },
     terms: {
       title: "Terms",

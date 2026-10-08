@@ -25,6 +25,7 @@ import { getEdition } from "@/services/editions";
 import { memberRole } from "@/services/lineages";
 import { listRounds } from "@/services/rounds";
 import { listTeams } from "@/services/teams";
+import type { LlmsEdition } from "@/utils/llms-txt";
 
 /** The lineage as the public sees it. */
 export type PublicLineage = Pick<Lineage, "id" | "slug" | "name" | "description">;
@@ -166,4 +167,44 @@ export const publicEdition = async (
   if (!found) return null;
   if (!isVisible(found.edition, found.lineage, viewerUserId)) return { hidden: true };
   return cachedPublicPayload(found.lineage, found.edition);
+};
+
+/**
+ * @function listPublicEditions
+ * @param limit {number} how many, newest first
+ * @returns {Promise<LlmsEdition[]>} editions anyone may see (live, or auto past setup), not
+ *          archived, with their lineage
+ */
+export const listPublicEditions = async (limit: number): Promise<LlmsEdition[]> => {
+  await connectDb();
+  const db = collections(getDb());
+  const editions = await db.editions
+    .find({
+      archived: { $ne: true },
+      $or: [{ siteMode: "live" }, { siteMode: "auto", phase: { $ne: "setup" } }],
+    })
+    .sort({ year: -1, createdAt: -1 })
+    .limit(limit)
+    .toArray();
+  const lineages = new Map(
+    (await db.lineages.find({}, { projection: { slug: 1, name: 1 } }).toArray()).map((l) => [
+      l._id.toHexString(),
+      l,
+    ]),
+  );
+  return editions.flatMap((e) => {
+    const lineage = lineages.get(e.lineageId);
+    return lineage
+      ? [
+          {
+            name: e.name,
+            slug: e.slug,
+            phase: e.phase,
+            mode: e.mode,
+            lineageSlug: lineage.slug,
+            lineageName: lineage.name,
+          },
+        ]
+      : [];
+  });
 };

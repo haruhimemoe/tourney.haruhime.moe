@@ -15,7 +15,11 @@ type Loader = () => Promise<{ default: ComponentType }>;
 
 /** Static imports: @next/mdx compiles only files named in the source. */
 export const LOADERS: Partial<Record<ContentSection, Record<string, Loader>>> = {
-  docs: { hosting: () => import("@content/docs/hosting.mdx") },
+  docs: {
+    hosting: () => import("@content/docs/hosting.mdx"),
+    playing: () => import("@content/docs/playing.mdx"),
+    results: () => import("@content/docs/results.mdx"),
+  },
   legal: {
     terms: () => import("@content/legal/terms.mdx"),
     privacy: () => import("@content/legal/privacy.mdx"),
