@@ -14,3 +14,4 @@ scripts/similar/.cache/
 scripts/similar/.venv/
 __pycache__/
 .pytest_cache/
+.vercel

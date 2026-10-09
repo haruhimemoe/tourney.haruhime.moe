@@ -2,7 +2,7 @@
 
 Run an osu! tournament in one place: registration, teams, qualifiers, the bracket, the schedule and results.
 
-- **Hosts** sign in with osu!, make a lineage (the series) and an edition, set up registration questions and rank or country limits, approve players, seed and generate a single or double elimination bracket (with groups or swiss first if you like), schedule matches across time zones and fill results from osu! multiplayer links.
+- **Hosts** sign in with osu!, make a lineage (the series) and an edition, set up registration questions and rank or country limits, approve players, seed and generate a single or double elimination bracket, schedule matches across time zones and fill results from osu! multiplayer links.
 - **Players** register, set their weekly availability and see their next match in their own time zone.
 - **Everyone** gets a public page per edition with the bracket, schedule, teams, mappools, rules and results.
 
