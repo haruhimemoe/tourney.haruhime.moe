@@ -20,7 +20,7 @@ export function Footer() {
   return (
     <SiteFooter
       columns={FOOTER_COLUMNS}
-      tools={{ position: 1 }}
+      tools={{ current: "tourney", position: 1 }}
       finePrint={SITE.trademarkNotice}
       parentHref={SITE.parentUrl}
       githubHref={SITE.githubOrg}
