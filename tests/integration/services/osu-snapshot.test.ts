@@ -13,7 +13,7 @@ import { takeSnapshot } from "@/services/osu-snapshot";
 import { osuHandlers } from "../../helpers/osu-server";
 
 const server = setupServer(...osuHandlers);
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
 afterAll(() => server.close());
 
 const now = new Date("2026-10-07T12:00:00.000Z");

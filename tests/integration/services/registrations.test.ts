@@ -30,7 +30,7 @@ import { osuHandlers } from "../../helpers/osu-server";
 
 setupTestDb();
 const server = setupServer(...osuHandlers);
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
 afterAll(() => server.close());
 
 const NOW = new Date("2026-10-10T12:00:00.000Z");

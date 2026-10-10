@@ -55,7 +55,7 @@ Dates match `date "+%a %b %-d, %Y"`. Update `@modified` on edits, never `@create
 
 - Everything under `tests/`, mirroring `src/` paths. Write the failing test first.
 - `bun run test` runs all three Vitest projects. The unit project runs with `TZ=America/Los_Angeles` on purpose.
-- Tests never reach osu! or pools: msw (`setupMsw` from `@haruhimemoe/next-kit/testing`, `onUnhandledRequest: "error"`) with `tests/helpers/osu-server.ts`, or injected fakes. The fake env is next-kit's `TEST_OSU_APP_ENV` and `stubOsuAppEnv`; the in-memory MongoDB is a one-member `MongoMemoryReplSet` (`tests/setup/integration-global.ts`), so transactions work.
+- Tests never reach osu! or pools: msw (`setupMsw` from `@haruhimemoe/next-kit/testing`, `onUnhandledFrame: "error"`) with `tests/helpers/osu-server.ts`, or injected fakes. The fake env is next-kit's `TEST_OSU_APP_ENV` and `stubOsuAppEnv`; the in-memory MongoDB is a one-member `MongoMemoryReplSet` (`tests/setup/integration-global.ts`), so transactions work.
 - Integration tests use `setupTestDb()` and build rows with the helpers in `tests/helpers/records.ts`. `tests/helpers/auth.ts` writes users and sessions straight into the `identity` database the way the hub would, and `setupTestDb()` empties those too.
 - Coverage floor: 90% on `src/utils/**` and `src/schemas/**`.
 

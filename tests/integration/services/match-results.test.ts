@@ -54,7 +54,7 @@ const server = setupServer(
     8002: [aWin(101), aWin(777)],
   }),
 );
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
 afterAll(() => server.close());
 beforeEach(() => vi.stubEnv("TOURNEY_SERVICE_SECRET", POOLS_SECRET));
 

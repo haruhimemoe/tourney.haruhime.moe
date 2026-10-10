@@ -22,7 +22,7 @@ import { osuHandlers } from "../../helpers/osu-server";
 
 setupTestDb();
 const server = setupServer(...osuHandlers);
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
 afterAll(() => server.close());
 
 const SOLO = { kind: "solo", lineup: 1, rosterMin: 1, rosterMax: 1, subsMax: 0 } as const;

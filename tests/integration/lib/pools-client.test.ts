@@ -14,7 +14,7 @@ import { getPool } from "@/lib/pools-client";
 import { POOL_SLOTS, POOLS_SECRET, poolsHandlers } from "../../helpers/pools-server";
 
 const server = setupServer(...poolsHandlers);
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
 afterAll(() => server.close());
 beforeEach(() => vi.stubEnv("TOURNEY_SERVICE_SECRET", POOLS_SECRET));
 

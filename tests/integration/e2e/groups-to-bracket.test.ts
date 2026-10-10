@@ -24,7 +24,7 @@ import { osuHandlers } from "../../helpers/osu-server";
 
 setupTestDb();
 const server = setupServer(...osuHandlers);
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
 afterAll(() => server.close());
 
 const TEAMS = 8;

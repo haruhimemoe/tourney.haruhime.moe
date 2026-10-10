@@ -46,7 +46,7 @@ const lobby = [101, 102].map((beatmapId) => ({
 }));
 
 const server = setupServer(...osuHandlers, ...poolsHandlers, matchHandler({ [LOBBY]: lobby }));
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
 afterAll(() => server.close());
 beforeEach(() => vi.stubEnv("TOURNEY_SERVICE_SECRET", POOLS_SECRET));
 
