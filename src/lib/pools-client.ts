@@ -41,7 +41,8 @@ export const getPool = async (poolId: string): Promise<AppResult<LinkedPool>> =>
   let service: ReturnType<typeof getPoolsService>;
   try {
     service = getPoolsService();
-  } catch {
+  } catch (error) {
+    console.error("[pools] service config", error);
     service = null;
   }
   if (!service) return fail("pool-unavailable");
@@ -61,7 +62,8 @@ export const getPool = async (poolId: string): Promise<AppResult<LinkedPool>> =>
       url: `${service.url}/pools/${id}`,
       slots: slots.map((s) => ({ ...s, slotKey: slotKey(s) })),
     });
-  } catch {
+  } catch (error) {
+    console.error(`[pools] pool ${poolId}`, error);
     return fail("pool-unavailable");
   }
 };
