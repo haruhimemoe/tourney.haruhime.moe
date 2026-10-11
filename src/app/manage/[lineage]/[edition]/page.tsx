@@ -65,9 +65,7 @@ export default async function ManageEditionPage({ params }: Props) {
         <TextLink href={`/manage/${lineage.slug}/${edition.slug}/registrations`}>
           Registrations
         </TextLink>
-        <TextLink href={`/manage/${lineage.slug}/${edition.slug}/settings/registration`}>
-          Registration settings
-        </TextLink>
+        <TextLink href={`/manage/${lineage.slug}/${edition.slug}/settings`}>Settings</TextLink>
         <TextLink href={`/manage/${lineage.slug}/${edition.slug}/rounds`}>
           Bracket and rounds
         </TextLink>

@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - CodeQL and a gitleaks history scan run in CI, and Dependabot keeps dependencies and pinned actions current.
+- A tabbed edition settings page (General, Socials, Contact, Registration, Modules) at `/manage/[lineage]/[edition]/settings`. The Modules tab is a placeholder for now. Lineage-level default editing stays API-only (`/api/manage/[lineage]/defaults`); there's no settings UI for it yet.
 
 ### Changed
 
