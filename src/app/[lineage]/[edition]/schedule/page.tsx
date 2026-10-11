@@ -3,7 +3,7 @@
  * @desc Every match by day in the viewer's time zone.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { ScheduleList } from "@/components/edition/ScheduleList";
@@ -21,7 +21,7 @@ export const generateMetadata = tabMetadata("Schedule");
  */
 export default async function SchedulePage({ params }: EditionParams) {
   const { lineage, edition } = await params;
-  const { matches, teams, zone } = await requirePublic(lineage, edition);
+  const { matches, teams, zone, hourCycle } = await requirePublic(lineage, edition);
   const names = teamNames(teams);
   const rows = matches
     .filter((m) => m.status !== "cancelled" && m.bracketCode)
@@ -34,5 +34,7 @@ export default async function SchedulePage({ params }: EditionParams) {
       scoreA: m.scoreA,
       scoreB: m.scoreB,
     }));
-  return <ScheduleList rows={rows} base={`/${lineage}/${edition}`} zone={zone} />;
+  return (
+    <ScheduleList rows={rows} base={`/${lineage}/${edition}`} zone={zone} hourCycle={hourCycle} />
+  );
 }

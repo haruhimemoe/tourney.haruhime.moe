@@ -4,18 +4,20 @@
  *       map's winner (warmups and aborts marked), and its mp, stream and VOD links.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { SectionHeading, StatList, TextLink } from "@haruhimemoe/ui";
 import type { PublicMatch } from "@/services/public-view";
 import { LocalTime } from "./LocalTime";
 
-/** MatchDetail's props: the match, its sides' names and the viewer's zone when known. */
+/** MatchDetail's props: the match, its sides' names and the viewer's zone and hour cycle when
+ * known. */
 export type MatchDetailProps = {
   match: PublicMatch;
   names: { a: string; b: string };
   zone?: string | null | undefined;
+  hourCycle?: "h12" | "h23" | null | undefined;
 };
 
 const VERB = { protect: "protects", ban: "bans", pick: "picks", tiebreaker: "tiebreaker" } as const;
@@ -32,7 +34,7 @@ export const slotLabel = (slot: string): string => slot.replace(/^[a-z]+:/, "").
  * @param props {MatchDetailProps} the match
  * @returns {JSX.Element} the match's details
  */
-export function MatchDetail({ match, names, zone }: MatchDetailProps) {
+export function MatchDetail({ match, names, zone, hourCycle }: MatchDetailProps) {
   const side = (s: "a" | "b" | null) => (s ? names[s] : "Tiebreaker");
   const links = [
     ...match.mpLinks.map((href, i) => ({
@@ -50,7 +52,11 @@ export function MatchDetail({ match, names, zone }: MatchDetailProps) {
           { label: "Best of", value: match.bestOf },
           {
             label: "Time",
-            value: match.scheduledAt ? <LocalTime at={match.scheduledAt} zone={zone} /> : "Not set",
+            value: match.scheduledAt ? (
+              <LocalTime at={match.scheduledAt} zone={zone} hourCycle={hourCycle} />
+            ) : (
+              "Not set"
+            ),
           },
           {
             label: "Score",

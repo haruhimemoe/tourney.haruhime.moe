@@ -4,13 +4,14 @@
  *       phase, the setup checklist and the button to the next phase. Anyone else gets a 404.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { PageHeader, TextLink } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { TimeHint } from "@/components/layout/TimeHint";
 import { PhaseButton } from "@/components/manage/PhaseButton";
 import { SetupChecklist } from "@/components/manage/SetupChecklist";
 import { PHASE_LABELS } from "@/constants/manage";
@@ -59,6 +60,7 @@ export default async function ManageEditionPage({ params }: Props) {
           next ? <PhaseButton lineage={lineage.slug} edition={edition.slug} to={next} /> : null
         }
       />
+      <TimeHint zone={user.preferences.timezone} hourCycle={user.preferences.hourCycle} />
       <nav aria-label="Edition pages" className="flex gap-4 text-sm">
         <TextLink href={`/manage/${lineage.slug}/${edition.slug}/registrations`}>
           Registrations

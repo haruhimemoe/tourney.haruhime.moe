@@ -3,7 +3,7 @@
  * @desc osu! tournaments open for registration now, closing soonest first, 20 a page.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
@@ -11,6 +11,8 @@ import { PageHeader, Pagination } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { BrowseList } from "@/components/home/BrowseList";
 import { PAGE_SEO, SEO_SITE } from "@/constants/seo";
+import { getCurrentUser } from "@/lib/auth-session";
+import { viewerPrefs } from "@/lib/public-page";
 import { openRegistrations } from "@/services/dashboard";
 
 /** The page's title, description and canonical URL. */
@@ -32,11 +34,15 @@ type Props = { searchParams: Promise<{ page?: string }> };
 export default async function BrowsePage({ searchParams }: Props) {
   const requested = Number.parseInt((await searchParams).page ?? "1", 10);
   const page = Number.isFinite(requested) && requested > 0 ? requested : 1;
-  const { items, pages } = await openRegistrations(new Date(), page);
+  const [{ items, pages }, viewerId] = await Promise.all([
+    openRegistrations(new Date(), page),
+    getCurrentUser().then((u) => u?.id ?? null),
+  ]);
+  const { zone, hourCycle } = await viewerPrefs(viewerId);
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title="Open registrations" lead="osu! tournaments taking players now." />
-      <BrowseList items={items} />
+      <BrowseList items={items} zone={zone} hourCycle={hourCycle} />
       {pages > 1 ? (
         <Pagination page={page} pageCount={pages} hrefFor={(n) => `/browse?page=${n}`} />
       ) : null}

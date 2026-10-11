@@ -13,3 +13,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Dependencies are on their latest versions, including msw 3 in the tests.
+- Times now show the hub's display preferences (time zone, 12h/24h, set at haruhime.moe/account#time) first, falling back to the saved profile zone and then the browser. A time hint with a link to that page sits in the manage and dashboard headers. next-kit 0.18.0.

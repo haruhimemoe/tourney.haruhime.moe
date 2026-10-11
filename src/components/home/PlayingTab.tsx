@@ -5,7 +5,7 @@
  *       that edition.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { Badge, Card, Disclosure, TextLink } from "@haruhimemoe/ui";
@@ -16,10 +16,12 @@ import type { PlayingEntry } from "@/services/dashboard";
 /** One edition's saved availability: the zone it was picked in and its slots there. */
 export type SavedAvailability = { zone: string; slots: number[] };
 
-/** PlayingTab's props: the entries, the viewer's zone, and saved availability by edition id. */
+/** PlayingTab's props: the entries, the viewer's zone and hour cycle, and saved availability by
+ * edition id. */
 export type PlayingTabProps = {
   entries: readonly PlayingEntry[];
   zone: string | null;
+  hourCycle?: "h12" | "h23" | null | undefined;
   availability: Readonly<Record<string, SavedAvailability>>;
 };
 
@@ -36,7 +38,7 @@ const STATUS: Record<string, string> = {
  * @param props {PlayingTabProps} the entries
  * @returns {JSX.Element} one card per edition
  */
-export function PlayingTab({ entries, zone, availability }: PlayingTabProps) {
+export function PlayingTab({ entries, zone, hourCycle, availability }: PlayingTabProps) {
   return (
     <div className="flex flex-col gap-4">
       {entries.map(({ edition, registration, team, nextMatch, poolUrl }) => {
@@ -55,7 +57,8 @@ export function PlayingTab({ entries, zone, availability }: PlayingTabProps) {
                   <TextLink href={`${base}/m/${nextMatch.code}`}>
                     {nextMatch.code} ({nextMatch.round})
                   </TextLink>{" "}
-                  vs {nextMatch.opponent ?? "TBD"}, <LocalTime at={nextMatch.at} zone={zone} />
+                  vs {nextMatch.opponent ?? "TBD"},{" "}
+                  <LocalTime at={nextMatch.at} zone={zone} hourCycle={hourCycle} />
                 </p>
               ) : (
                 <p className="text-c3">No match scheduled yet.</p>

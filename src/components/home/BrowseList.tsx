@@ -4,7 +4,7 @@
  *       registration closes.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { LinkCard } from "@haruhimemoe/ui";
@@ -12,12 +12,19 @@ import { LocalTime } from "@/components/edition/LocalTime";
 import type { BrowseItem } from "@/services/dashboard";
 import { rankLabel, sidesLabel } from "@/utils/side-format";
 
+/** BrowseList's props: the open editions, and the viewer's zone and hour cycle when known. */
+export type BrowseListProps = {
+  items: readonly BrowseItem[];
+  zone?: string | null | undefined;
+  hourCycle?: "h12" | "h23" | null | undefined;
+};
+
 /**
  * @function BrowseList
- * @param props {{ items: readonly BrowseItem[] }} the open editions
+ * @param props {BrowseListProps} the open editions and the viewer's display preferences
  * @returns {JSX.Element} the list, or a line saying nothing is open
  */
-export function BrowseList({ items }: { items: readonly BrowseItem[] }) {
+export function BrowseList({ items, zone, hourCycle }: BrowseListProps) {
   if (!items.length) return <p className="text-c3">Nothing is open for registration right now.</p>;
   return (
     <ul className="flex flex-col gap-3">
@@ -31,7 +38,8 @@ export function BrowseList({ items }: { items: readonly BrowseItem[] }) {
               </span>
               {edition.registration.closesAt ? (
                 <span className="text-c3">
-                  Closes <LocalTime at={edition.registration.closesAt} />
+                  Closes{" "}
+                  <LocalTime at={edition.registration.closesAt} zone={zone} hourCycle={hourCycle} />
                 </span>
               ) : null}
             </span>

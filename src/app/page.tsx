@@ -5,7 +5,7 @@
  *       only with content. Signed out, or with neither: browse open registrations, or host.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { PageHeader } from "@haruhimemoe/ui";
@@ -13,8 +13,9 @@ import { HomeTabs } from "@/components/home/HomeTabs";
 import { HostingTab } from "@/components/home/HostingTab";
 import { PlayingTab, type SavedAvailability } from "@/components/home/PlayingTab";
 import { SignedOutHome } from "@/components/home/SignedOutHome";
+import { TimeHint } from "@/components/layout/TimeHint";
 import { getCurrentUser, hubSignInHref } from "@/lib/auth-session";
-import { viewerZone } from "@/lib/public-page";
+import { profileTimezone } from "@/lib/public-page";
 import { getAvailability, localSlots } from "@/services/availability";
 import { dashboardFor } from "@/services/dashboard";
 
@@ -36,10 +37,12 @@ export default async function HomePage() {
       </div>
     );
   const now = new Date();
-  const [{ playing, hosting }, zone] = await Promise.all([
+  const [{ playing, hosting }, fallbackZone] = await Promise.all([
     dashboardFor(user.id, now),
-    viewerZone(user.id),
+    profileTimezone(user.id),
   ]);
+  const zone = user.preferences.timezone ?? fallbackZone;
+  const hourCycle = user.preferences.hourCycle;
   const availability: Record<string, SavedAvailability> = {};
   for (const entry of playing) {
     const row = await getAvailability(user.id, entry.edition.id);
@@ -49,11 +52,17 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={`Hi, ${user.username}`} />
+      <TimeHint zone={zone} hourCycle={hourCycle} />
       {playing.length || hosting.length ? (
         <HomeTabs
           playing={
             playing.length ? (
-              <PlayingTab entries={playing} zone={zone} availability={availability} />
+              <PlayingTab
+                entries={playing}
+                zone={zone}
+                hourCycle={hourCycle}
+                availability={availability}
+              />
             ) : null
           }
           hosting={hosting.length ? <HostingTab entries={hosting} /> : null}

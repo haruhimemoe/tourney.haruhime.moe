@@ -3,7 +3,7 @@
  * @desc The edition's overview: phase, dates, format, registration and the host's rules.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { isRegistrationOpen } from "@haruhimemoe/tourney";
@@ -33,8 +33,9 @@ const PHASE = {
 export default async function OverviewPage({ params }: EditionParams) {
   const { lineage, edition } = await params;
   const page = await requirePublic(lineage, edition);
-  const { edition: e, zone } = page;
-  const at = (iso: string | null) => (iso ? <LocalTime at={iso} zone={zone} /> : "Not set");
+  const { edition: e, zone, hourCycle } = page;
+  const at = (iso: string | null) =>
+    iso ? <LocalTime at={iso} zone={zone} hourCycle={hourCycle} /> : "Not set";
   const sides = e.sides.kind === "solo" ? "1v1" : `${e.sides.lineup}v${e.sides.lineup}`;
   return (
     <div className="flex flex-col gap-6">

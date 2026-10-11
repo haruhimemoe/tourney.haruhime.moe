@@ -2,10 +2,11 @@
  * @file src/components/edition/ScheduleList.tsx
  * @desc The public schedule: matches grouped by day in the viewer's zone (UTC until the browser
  *       says, unless the server knows it), earliest first, unscheduled matches last. Each match
- *       links to its page.
+ *       links to its page. Times use the viewer's hub hour cycle, or the browser locale's own
+ *       when it's null.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
@@ -25,11 +26,13 @@ export type ScheduleListRow = {
   scoreB: number | null;
 };
 
-/** ScheduleList's props: the rows, the edition's base path, the viewer's zone when known. */
+/** ScheduleList's props: the rows, the edition's base path, the viewer's zone and hour cycle
+ * when known. */
 export type ScheduleListProps = {
   rows: readonly ScheduleListRow[];
   base: string;
   zone?: string | null | undefined;
+  hourCycle?: "h12" | "h23" | null | undefined;
 };
 
 const UNSCHEDULED = "Not scheduled yet";
@@ -39,7 +42,7 @@ const UNSCHEDULED = "Not scheduled yet";
  * @param props {ScheduleListProps} the rows
  * @returns {JSX.Element} one section per day
  */
-export function ScheduleList({ rows, base, zone }: ScheduleListProps) {
+export function ScheduleList({ rows, base, zone, hourCycle }: ScheduleListProps) {
   const viewer = useViewerZone(zone);
   const sorted = [...rows].sort(
     (x, y) =>
@@ -63,7 +66,11 @@ export function ScheduleList({ rows, base, zone }: ScheduleListProps) {
             {list.map((r) => (
               <li key={r.code} className="flex flex-wrap items-baseline gap-x-3">
                 <span className="w-14 text-c3 tabular-nums">
-                  {r.scheduledAt ? formatTime(r.scheduledAt, viewer).split(", ").at(-1) : "-"}
+                  {r.scheduledAt
+                    ? formatTime(r.scheduledAt, viewer, hourCycle ?? null)
+                        .split(", ")
+                        .at(-1)
+                    : "-"}
                 </span>
                 <TextLink href={`${base}/m/${r.code}`} variant="plain">
                   {r.code}

@@ -5,9 +5,10 @@
  *       withdrawals that reach the team.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
+import { DEFAULT_PREFERENCES } from "@haruhimemoe/next-kit/preferences";
 import { setupServer } from "msw/node";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { collections, fromId } from "@/lib/collections";
@@ -63,6 +64,7 @@ const player = async (osuId: number): Promise<SessionUser> => ({
   ...(await createTestUser(osuId)),
   avatarUrl: null,
   isAdmin: false,
+  preferences: DEFAULT_PREFERENCES,
 });
 
 const solo = (patch: Partial<Edition> = {}) => openEdition({ sides: SOLO, ...patch });

@@ -1,17 +1,16 @@
 /**
  * @file tests/components/edition/edition-components.test.tsx
- * @desc The public edition's parts: rules Markdown rendered as elements (HTML stays text), times
- *       in UTC with a datetime until a zone is known, the schedule grouped by day in the viewer's
- *       zone, teams with escaped names, pool links only for revealed rounds, the results table,
- *       and the match page's pick/ban order and per-map winners.
+ * @desc The public edition's parts: rules Markdown rendered as elements (HTML stays text), the
+ *       schedule grouped by day in the viewer's zone, teams with escaped names, pool links only
+ *       for revealed rounds, the results table, and the match page's pick/ban order and per-map
+ *       winners. LocalTime itself (zone, hour cycle, UTC/mount fallback) has its own test file.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { LocalTime } from "@/components/edition/LocalTime";
 import { MatchDetail } from "@/components/edition/MatchDetail";
 import { PoolLinks } from "@/components/edition/PoolLinks";
 import { ResultsTable } from "@/components/edition/ResultsTable";
@@ -32,20 +31,6 @@ describe("RulesText", () => {
     expect(screen.getByRole("link", { name: "osu" })).toHaveAttribute("rel", "nofollow noopener");
     expect(container.querySelector("script")).toBeNull();
     expect(screen.getByText("<script>x</script>")).toBeTruthy();
-  });
-});
-
-describe("LocalTime", () => {
-  it("shows a given zone, with the instant in datetime", () => {
-    render(<LocalTime at="2026-11-02T18:00:00.000Z" zone="Asia/Tokyo" />);
-    const time = screen.getByText(/Tue, Nov 3, 03:00/);
-    expect(time.tagName).toBe("TIME");
-    expect(time).toHaveAttribute("dateTime", "2026-11-02T18:00:00.000Z");
-  });
-
-  it("labels UTC when the zone is UTC", () => {
-    render(<LocalTime at="2026-11-02T18:00:00.000Z" zone="UTC" />);
-    expect(screen.getByText("Mon, Nov 2, 18:00 UTC")).toBeTruthy();
   });
 });
 

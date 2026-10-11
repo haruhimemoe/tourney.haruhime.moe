@@ -8,9 +8,15 @@
  *       to refresh it there. A banned user reads as signed out (requireSession). Anyone with an
  *       osu! account can host or register; admin rights come only from ADMIN_OSU_IDS, read on
  *       every request, so a removed id stops being an admin at once.
+ *
+ *       The session reader's SatelliteSessionReader shape doesn't carry display preferences
+ *       (time zone, 12h/24h), so getUserFromHeaders reads them straight off the identity
+ *       database with next-kit's readPreferences, the same read-only path every other identity
+ *       field on this app goes through. readPreferences never throws: a stored string that
+ *       isn't JSON, names an unknown zone, or is missing falls back to defaults.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import "server-only";
@@ -19,6 +25,7 @@ import {
   requireSession,
   type SessionReaderInstance,
 } from "@haruhimemoe/next-kit/auth";
+import { readPreferences } from "@haruhimemoe/next-kit/preferences/server";
 import { getHubUrl, getServerEnv } from "@/env";
 import { isAdminOsuId } from "@/lib/admin";
 import { connectDb, getIdentityDb } from "@/lib/db";
@@ -43,12 +50,15 @@ export const getSessionReader = (): SessionReaderInstance => {
 /**
  * @function getUserFromHeaders
  * @param headers {Headers} request headers (the hub's session cookie)
- * @returns {Promise<SessionUser | null>} the signed-in, unbanned user, or null
+ * @returns {Promise<SessionUser | null>} the signed-in, unbanned user with their hub
+ *          preferences, or null
  */
 export const getUserFromHeaders = async (headers: Headers): Promise<SessionUser | null> => {
   await connectDb();
   const user = await requireSession(getSessionReader(), headers);
-  return user ? { ...user, isAdmin: isAdminOsuId(user.osuId) } : null;
+  if (!user) return null;
+  const preferences = await readPreferences(getIdentityDb(), user.id);
+  return { ...user, isAdmin: isAdminOsuId(user.osuId), preferences };
 };
 
 /**

@@ -3,7 +3,7 @@
  * @desc One match for the public. An unknown code, a bye or a cancelled match answers 404.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
@@ -59,7 +59,7 @@ export default async function PublicMatchPage(props: Props) {
       <SectionHeading>
         {code}: {names.a} vs {names.b}
       </SectionHeading>
-      <MatchDetail match={match} names={names} zone={page.zone} />
+      <MatchDetail match={match} names={names} zone={page.zone} hourCycle={page.hourCycle} />
     </section>
   );
 }

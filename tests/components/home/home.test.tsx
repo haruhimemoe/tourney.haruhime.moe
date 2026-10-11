@@ -5,7 +5,7 @@
  *       home has its two entry points, and browse lists open editions.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
@@ -70,7 +70,7 @@ describe("PlayingTab", () => {
     expect(screen.getByRole("link", { name: "EGC 2026" })).toHaveAttribute("href", "/egc/egc2026");
     expect(screen.getByRole("link", { name: /M3/ })).toHaveAttribute("href", "/egc/egc2026/m/M3");
     expect(screen.getByText(/vs Kyon/)).toBeTruthy();
-    expect(screen.getByText(/Tue, Nov 3, 00:00 UTC/)).toBeTruthy();
+    expect(screen.getByText(/Tue, Nov 3, 12:00 AM UTC/)).toBeTruthy();
     expect(screen.getByRole("link", { name: /pool/i })).toHaveAttribute(
       "href",
       "https://pools.haruhime.moe/pools/p-sf",

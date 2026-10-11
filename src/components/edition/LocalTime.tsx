@@ -1,20 +1,25 @@
 /**
  * @file src/components/edition/LocalTime.tsx
- * @desc An instant in the viewer's zone: the given zone (their profile's), else UTC from the
- *       server, swapped to the browser's zone after mount. Always a `<time dateTime>`, so the
- *       instant reads without JavaScript too.
+ * @desc An instant in the viewer's zone: the given zone (the hub's preference, falling back to
+ *       the profile's), else UTC from the server, swapped to the browser's zone after mount.
+ *       The hour cycle is the same fallback: the hub preference, or the browser locale's own
+ *       when it's null. Always a `<time dateTime>`, so the instant reads without JavaScript too.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
+import { formatInstant } from "@haruhimemoe/next-kit/preferences";
 import { useEffect, useState } from "react";
-import { formatTime } from "@/utils/zoned-time";
 
-/** LocalTime's props: the instant, and the viewer's zone when the server knows it. */
-export type LocalTimeProps = { at: string; zone?: string | null | undefined };
+/** LocalTime's props: the instant, the viewer's zone and hour cycle when the server knows them. */
+export type LocalTimeProps = {
+  at: string;
+  zone?: string | null | undefined;
+  hourCycle?: "h12" | "h23" | null | undefined;
+};
 
 /**
  * @function useViewerZone
@@ -31,14 +36,14 @@ export const useViewerZone = (zone?: string | null): string => {
 
 /**
  * @function LocalTime
- * @param props {LocalTimeProps} the instant and zone
+ * @param props {LocalTimeProps} the instant, zone and hour cycle
  * @returns {JSX.Element} the time element
  */
-export function LocalTime({ at, zone }: LocalTimeProps) {
+export function LocalTime({ at, zone, hourCycle }: LocalTimeProps) {
   const viewer = useViewerZone(zone);
   return (
     <time dateTime={at} title={at}>
-      {formatTime(at, viewer)}
+      {formatInstant(at, { timeZone: viewer, hourCycle: hourCycle ?? null })}
       {viewer === "UTC" ? " UTC" : ""}
     </time>
   );
