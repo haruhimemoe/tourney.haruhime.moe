@@ -1,7 +1,7 @@
 /**
  * @file tests/components/edition/StaffContact.test.tsx
  * @desc The public "contact staff" line: a Discord handle as plain text and/or a mailto link,
- *       only when at least one is set.
+ *       only when at least one is set, including the email-only case.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 11, 2026
  * @modified Sun Oct 11, 2026
@@ -31,5 +31,15 @@ describe("StaffContact", () => {
     render(<StaffContact contact={{ email: null, discord: "host#0001" }} />);
     expect(screen.getByText("host#0001")).toBeInTheDocument();
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
+  });
+
+  it("renders just the mailto link when only email is set", () => {
+    render(<StaffContact contact={{ email: "host@example.com", discord: null }} />);
+    expect(screen.getByText(/Questions\? Contact staff/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "host@example.com" })).toHaveAttribute(
+      "href",
+      "mailto:host@example.com",
+    );
+    expect(screen.queryByText(/on Discord/)).not.toBeInTheDocument();
   });
 });

@@ -1,7 +1,9 @@
 /**
  * @file src/components/manage/GeneralSettingsForm.tsx
  * @desc An edition's general settings in one save: name, acronym, start and end dates (in the
- *       host's own time zone, stored UTC), rules text, banner, hue and site visibility.
+ *       host's own time zone, stored UTC), rules text, banner, hue and site visibility. A
+ *       non-empty hue that isn't a whole number from 0 to 359 shows a field error under Hue and
+ *       blocks the save, instead of silently turning into null.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 11, 2026
  * @modified Sun Oct 11, 2026
@@ -32,7 +34,28 @@ const SITE_MODE_OPTIONS = [
   { value: "hidden", label: "Hidden", hint: "Only lineage members see it." },
 ] as const satisfies readonly { value: (typeof SITE_MODES)[number]; label: string; hint: string }[];
 
-const toHue = (text: string): number | null => (/^\d+$/.test(text.trim()) ? Number(text) : null);
+/**
+ * @function hueError
+ * @param text {string} the hue field's raw text
+ * @returns {string | null} a field error when the text is non-empty and isn't a whole number
+ *          from 0 to 359; null when it's empty (meaning "use the lineage's own") or valid
+ */
+const hueError = (text: string): string | null => {
+  const trimmed = text.trim();
+  if (!trimmed) return null;
+  if (!/^\d+$/.test(trimmed) || Number(trimmed) > 359) return "Enter a whole number from 0 to 359.";
+  return null;
+};
+
+/**
+ * @function toHue
+ * @param text {string} the hue field's raw text, already checked by hueError
+ * @returns {number | null} the hue, or null for an empty field
+ */
+const toHue = (text: string): number | null => {
+  const trimmed = text.trim();
+  return trimmed ? Number(trimmed) : null;
+};
 
 /**
  * @function GeneralSettingsForm
@@ -51,9 +74,16 @@ export function GeneralSettingsForm({ lineage, edition, initial }: GeneralSettin
   const [siteMode, setSiteMode] = useState<(typeof SITE_MODES)[number]>(initial.siteMode);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ tone: "info" | "error"; text: string } | null>(null);
+  const [hueFieldError, setHueFieldError] = useState<string | null>(null);
 
   const save = async (event: FormEvent) => {
     event.preventDefault();
+    const error = hueError(hue);
+    if (error) {
+      setHueFieldError(error);
+      return;
+    }
+    setHueFieldError(null);
     setBusy(true);
     const result = await postJson(
       `/api/manage/${lineage}/${edition}/settings`,
@@ -133,7 +163,11 @@ export function GeneralSettingsForm({ lineage, edition, initial }: GeneralSettin
           hint="0 to 359. Empty for the lineage's own."
           inputMode="numeric"
           value={hue}
-          onChange={(e) => setHue(e.target.value)}
+          onChange={(e) => {
+            setHue(e.target.value);
+            if (hueFieldError) setHueFieldError(null);
+          }}
+          error={hueFieldError ?? undefined}
           disabled={busy}
         />
       </section>

@@ -2,10 +2,11 @@
  * @file tests/integration/services/editions.test.ts
  * @desc Editions: one active edition per owner (ten for a verified host), charged to the
  *       lineage owner even when an admin creates it, exactly one of two concurrent creates
- *       through; codes that slug the same are refused; edits are parsed; phases move forward
- *       only, with the library's error; a new edition copies the lineage's social/contact/hue
- *       defaults, and a later change to those defaults leaves it alone; a row stored before
- *       acronym/bannerUrl/hue/socials/contact existed still reads with them filled in.
+ *       through; codes that slug the same are refused; an end date before the start date is
+ *       refused; edits are parsed; phases move forward only, with the library's error; a new
+ *       edition copies the lineage's social/contact/hue defaults, and a later change to those
+ *       defaults leaves it alone; a row stored before acronym/bannerUrl/hue/socials/contact
+ *       existed still reads with them filled in.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Sun Oct 11, 2026
@@ -83,6 +84,14 @@ describe("editions", () => {
     const again = await createEdition(user.id, lineage.id, { ...edition, code: "egc-2026" });
     expect(codeOf(again)).toBe("slug-taken");
     expect(codeOf(await createEdition(user.id, lineage.id, { ...edition, code: "!!" }))).toBe(
+      "bad-input",
+    );
+  });
+
+  it("refuses an end date before the start date", async () => {
+    const { user, lineage } = await ownerWithLineage();
+    const dates = { start: "2026-06-10T00:00:00.000Z", end: "2026-06-01T00:00:00.000Z" };
+    expect(codeOf(await createEdition(user.id, lineage.id, { ...edition, dates }))).toBe(
       "bad-input",
     );
   });

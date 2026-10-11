@@ -3,9 +3,11 @@
  * @desc An edition's social links: add (12 at most), reorder by drag, keys or the move buttons
  *       (ui's SortableList), a kind select, its URL, a label when the kind is "custom", remove.
  *       Saves on its own PATCH to the settings route; a 400's issues (ui's postJson passes them
- *       through) point each field error at its row by the issue's array index. Controlled rows
- *       carry a local-only key (the stored Social has none) so SortableList and React both have
- *       a stable identity across reorders.
+ *       through) point each field error at its row by the issue's array index. A row's label is
+ *       forced to null before it's sent whenever its kind isn't "custom" (the schema refuses a
+ *       label on any other kind), even if the row carried a stale one. Controlled rows carry a
+ *       local-only key (the stored Social has none) so SortableList and React both have a
+ *       stable identity across reorders.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 11, 2026
  * @modified Sun Oct 11, 2026
@@ -96,7 +98,9 @@ export function SocialsEditor({ lineage, edition, initial }: SocialsEditorProps)
   const save = async (event: FormEvent) => {
     event.preventDefault();
     setBusy(true);
-    const socials: Social[] = rows.map(({ key: _key, ...s }) => s);
+    const socials: Social[] = rows.map(({ key: _key, ...s }) =>
+      s.kind === "custom" ? s : { ...s, label: null },
+    );
     const result = await postJson(
       `/api/manage/${lineage}/${edition}/settings`,
       { socials },

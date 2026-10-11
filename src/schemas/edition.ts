@@ -2,10 +2,13 @@
  * @file src/schemas/edition.ts
  * @desc An edition: one run of a lineage. The library's TournamentSchema plus where it lives
  *       (lineage, slug), dates, rules, who may register, its questions, its bracket config and
- *       its settings page fields (acronym, banner, hue, socials, contact). BWS is out of v0, so
- *       eligibility has rank, countries and regions only. withEditionDefaults patches in those
- *       settings fields for a row written before they existed, without a full re-parse (so other
- *       legacy drift in an old row doesn't start throwing on read).
+ *       its settings page fields (acronym, banner, hue, socials, contact). DatesSchema refuses a
+ *       start after an end (only when both are set), on ["end"], so the settings PATCH body and
+ *       createEdition (both built from EditionSchema.shape.dates / EditionSchema itself) share
+ *       the one rule. BWS is out of v0, so eligibility has rank, countries and regions only.
+ *       withEditionDefaults patches in those settings fields for a row written before they
+ *       existed, without a full re-parse (so other legacy drift in an old row doesn't start
+ *       throwing on read).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Sun Oct 11, 2026
@@ -41,6 +44,18 @@ const range = z
   .object({ min: z.number().int().positive(), max: z.number().int().positive() })
   .refine((r) => r.min <= r.max, "min is above max");
 
+/**
+ * An edition's dates: start and end are each optional, but when both are set, start can't be
+ * after end. Shared by EditionSchema (so createEdition's safeParse enforces it) and the settings
+ * PATCH route's body schema (EditionSchema.shape.dates).
+ */
+export const DatesSchema = z
+  .object({ start: InstantSchema.nullable(), end: InstantSchema.nullable() })
+  .refine((d) => d.start === null || d.end === null || d.start <= d.end, {
+    message: "The end date can't be before the start date.",
+    path: ["end"],
+  });
+
 /** When the public page shows: auto from registration on, never, or always. */
 export const SITE_MODES = ["auto", "hidden", "live"] as const;
 
@@ -73,7 +88,7 @@ export const EditionSchema = TournamentSchema.extend({
   lineageId: IdSchema,
   slug: z.string().min(1).max(16),
   year: z.number().int().min(2007).max(2100),
-  dates: z.object({ start: InstantSchema.nullable(), end: InstantSchema.nullable() }),
+  dates: DatesSchema,
   rulesText: z.string().max(MAX_RULES_TEXT),
   siteMode: z.enum(SITE_MODES),
   qualifiers: z.object({ enabled: z.boolean(), method: z.enum(["sum", "average-rank"]) }),
