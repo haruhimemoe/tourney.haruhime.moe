@@ -4,14 +4,17 @@
  *       approved in a running edition is withdrawn and dropped from their team; approved rows
  *       in done editions keep only the osu! id (two users in one edition included); their
  *       finished lineage stays up, orphaned; export lists what they have; delete runs twice.
+ *       A fixture module (`@/modules/registry` mocked) shows export keys its data under
+ *       `modules`, and delete runs every module's deleteUser, reporting module-delete-failed
+ *       (without skipping the others) when one throws.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { ObjectId } from "mongodb";
 import { revalidateTag } from "next/cache";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { collections } from "@/lib/collections";
 import { getDb } from "@/lib/db";
 import { deleteUser, exportUser } from "@/services/account-data";
@@ -22,7 +25,44 @@ import { setupTestDb } from "../../helpers/db";
 import { seedLineage } from "../../helpers/manage";
 import { T0 } from "../../helpers/records";
 
+const { testModule, otherModule } = vi.hoisted(() => {
+  const testModule = {
+    id: "test-module",
+    name: "Test Module",
+    description: "a fixture module",
+    scope: "lineage" as const,
+    permissions: ["test-module.read"] as const,
+    events: ["test-module.created"] as const,
+    exportUser: vi.fn(async (userId: string) => ({ seen: userId })),
+    deleteUser: vi.fn(async () => {}),
+  };
+  const otherModule = {
+    id: "other-module",
+    name: "Other Module",
+    description: "a second fixture module",
+    scope: "lineage" as const,
+    permissions: ["other-module.read"] as const,
+    events: ["other-module.created"] as const,
+    exportUser: vi.fn(async () => ({})),
+    deleteUser: vi.fn(async () => {}),
+  };
+  return { testModule, otherModule };
+});
+
+vi.mock("@/modules/registry", () => ({
+  MODULES: [testModule, otherModule],
+  findModule: (id: string) => [testModule, otherModule].find((m) => m.id === id),
+  checkRegistry: () => {},
+}));
+
 setupTestDb();
+
+afterEach(() => {
+  testModule.exportUser.mockClear();
+  testModule.deleteUser.mockClear().mockImplementation(async () => {});
+  otherModule.exportUser.mockClear();
+  otherModule.deleteUser.mockClear().mockImplementation(async () => {});
+});
 
 const db = () => collections(getDb());
 
@@ -143,6 +183,36 @@ describe("deleteUser", () => {
     expect((await deleteUser(admin.id)).ok).toBe(true);
     expect((await getLineageBySlug(lineage.slug))?.members).toHaveLength(1);
   });
+
+  it("never reaches module deleteUser while the owns-active-edition refusal applies", async () => {
+    const { owner } = await seedLineage();
+    expect((await deleteUser(owner.id)).ok).toBe(false);
+    expect(testModule.deleteUser).not.toHaveBeenCalled();
+  });
+
+  it("runs every module's deleteUser once the user can actually be deleted", async () => {
+    const { lineage, editionId } = await seedLineage();
+    const player = await createTestUser(2);
+    await moveEditionPhase(editionId, "done");
+    void lineage;
+    expect((await deleteUser(player.id)).ok).toBe(true);
+    expect(testModule.deleteUser).toHaveBeenCalledWith(player.id);
+    expect(otherModule.deleteUser).toHaveBeenCalledWith(player.id);
+  });
+
+  it("runs every module even when one fails, and reports module-delete-failed", async () => {
+    const { lineage, editionId } = await seedLineage();
+    const player = await createTestUser(2);
+    await moveEditionPhase(editionId, "done");
+    void lineage;
+    testModule.deleteUser.mockImplementation(async () => {
+      throw new Error("boom");
+    });
+    const result = await deleteUser(player.id);
+    expect(result.ok ? null : result.error.code).toBe("module-delete-failed");
+    // The other module still ran, even though test-module blew up.
+    expect(otherModule.deleteUser).toHaveBeenCalledWith(player.id);
+  });
 });
 
 describe("exportUser", () => {
@@ -155,6 +225,17 @@ describe("exportUser", () => {
     expect(data.registrations).toHaveLength(1);
     expect(data.profile).toEqual([]);
     expect(data.availability).toEqual([]);
+  });
+
+  it("keys each registered module's export under modules, by module id", async () => {
+    const { owner } = await seedLineage();
+    const data = await exportUser(owner.id);
+    expect(data.modules).toEqual({
+      "test-module": { seen: owner.id },
+      "other-module": {},
+    });
+    expect(testModule.exportUser).toHaveBeenCalledWith(owner.id);
+    expect(otherModule.exportUser).toHaveBeenCalledWith(owner.id);
   });
 
   it("leaves out editions of lineages they only admin", async () => {

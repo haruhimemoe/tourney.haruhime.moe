@@ -5,7 +5,7 @@
  *       without a message a type error.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import type { TourneyErrorCode } from "@haruhimemoe/tourney";
@@ -17,6 +17,7 @@ export type AppErrorCode =
   | "edition-limit"
   | "forbidden"
   | "owns-active-edition"
+  | "module-delete-failed"
   | "osu-user-unavailable"
   | "osu-unavailable"
   | "team-name-taken"
@@ -50,6 +51,8 @@ export const ERROR_MESSAGES = {
   forbidden: "You can't change this tournament.",
   "owns-active-edition":
     "You own a lineage with an edition still running. Finish it or transfer the lineage first.",
+  "module-delete-failed":
+    "A module failed to delete this account's data. Retry; what already went won't run twice.",
   "already-registered": "You're already registered for this edition.",
   ineligible: "You don't meet this edition's eligibility rules.",
   "player-on-team": "A player you listed is already on another team in this edition.",

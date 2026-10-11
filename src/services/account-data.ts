@@ -6,16 +6,20 @@
  *       editions (a solo team is marked withdrawn, a team drops them from its roster) and deletes
  *       them; keeps approved registrations in finished editions with only the osu! id, so past
  *       brackets stay whole; deletes their other registrations; takes them off lineages they
- *       admin; and leaves lineages they own (all finished) up, orphaned. Running it twice is fine.
+ *       admin; leaves lineages they own (all finished) up, orphaned; and runs every registered
+ *       module's deleteUser (all of them, even if one throws; module-delete-failed only after
+ *       every module has had its turn, so one bad module never stops the rest). Running it twice
+ *       is fine. Export adds each module's exportUser under `modules`, keyed by module id.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import "server-only";
 import { collections, fromId } from "@/lib/collections";
 import { connectDb, getDb } from "@/lib/db";
 import { revalidateEdition } from "@/lib/revalidate";
+import { MODULES } from "@/modules/registry";
 import { withdrawFromTeam } from "@/services/teams";
 import { type AppResult, fail, ok } from "@/utils/result";
 
@@ -23,24 +27,42 @@ const ownerFilter = (userId: string) => ({
   members: { $elemMatch: { userId, role: "owner" as const } },
 });
 
+/** What exportUser returns: this app's rows, plus each module's own export, keyed by its id. */
+export type AccountExport = {
+  lineages: unknown[];
+  editions: unknown[];
+  registrations: unknown[];
+  availability: unknown[];
+  profile: unknown[];
+  modules: Record<string, Record<string, unknown>>;
+};
+
 /**
  * @function exportUser
  * @param userId {string} an identity user id
- * @returns {Promise<Record<string, unknown[]>>} the lineages they own with their editions, their
- *          registrations, availability and profile
+ * @returns {Promise<AccountExport>} the lineages they own with their editions, their
+ *          registrations, availability and profile, plus every registered module's export
  */
-export const exportUser = async (userId: string): Promise<Record<string, unknown[]>> => {
+export const exportUser = async (userId: string): Promise<AccountExport> => {
   await connectDb();
   const db = collections(getDb());
   const lineages = await db.lineages.find(ownerFilter(userId)).toArray();
   const ids = lineages.map((l) => l._id.toHexString());
-  const [editions, registrations, availability, profile] = await Promise.all([
+  const [editions, registrations, availability, profile, moduleExports] = await Promise.all([
     ids.length ? db.editions.find({ lineageId: { $in: ids } }).toArray() : [],
     db.registrations.find({ userId }).toArray(),
     db.availability.find({ userId }).toArray(),
     db.profiles.find({ userId }, { projection: { _id: 0 } }).toArray(),
+    Promise.all(MODULES.map(async (m) => [m.id, await m.exportUser(userId)] as const)),
   ]);
-  return { lineages, editions, registrations, availability, profile };
+  return {
+    lineages,
+    editions,
+    registrations,
+    availability,
+    profile,
+    modules: Object.fromEntries(moduleExports),
+  };
 };
 
 /**
@@ -92,5 +114,11 @@ export const deleteUser = async (userId: string): Promise<AppResult<{ deleted: n
     $set: { orphaned: true, updatedAt: new Date().toISOString() },
   });
   for (const id of editionIds) revalidateEdition(id);
+
+  // Every module runs, even if one fails: a settled read, not a thrown one, so the rest still
+  // get their turn. Report only after all of them have gone.
+  const moduleResults = await Promise.allSettled(MODULES.map((m) => m.deleteUser(userId)));
+  if (moduleResults.some((r) => r.status === "rejected")) return fail("module-delete-failed");
+
   return ok({ deleted });
 };

@@ -1,10 +1,11 @@
 /**
  * @file src/schemas/lineage.ts
  * @desc A lineage: a tournament series (Evergreen Cup) with one owner, its admins and the
- *       defaults each new edition starts from (including socials, contact and hue). Its slug is
- *       the first URL segment, so route names are reserved. withLineageDefaults patches in those
- *       default fields for a row written before they existed, without a full re-parse (so other
- *       legacy drift in an old row doesn't start throwing on read).
+ *       defaults each new edition starts from (including socials, contact and hue), plus the
+ *       opt-in module ids it has turned on. Its slug is the first URL segment, so route names
+ *       are reserved. withLineageDefaults patches in those default fields, and `modules`, for a
+ *       row written before they existed, without a full re-parse (so other legacy drift in an
+ *       old row doesn't start throwing on read).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Sun Oct 11, 2026
@@ -66,6 +67,8 @@ export const LineageSchema = z.object({
     contact: ContactSchema.default({ email: null, discord: null }),
     hue: z.number().int().min(0).max(359).nullable().default(null),
   }),
+  /** Opt-in module ids turned on for this lineage; each must be in the registry to take effect. */
+  modules: z.array(z.string()).max(32).default([]),
   createdAt: InstantSchema,
   updatedAt: InstantSchema,
 });
@@ -76,12 +79,13 @@ export type Lineage = z.infer<typeof LineageSchema>;
 /**
  * @function withLineageDefaults
  * @param doc {Lineage} a lineage as read from storage, maybe from before `defaults.socials`,
- *        `defaults.contact` or `defaults.hue` existed
- * @returns {Lineage} the same row with those three filled in when missing; every other field,
+ *        `defaults.contact`, `defaults.hue` or `modules` existed
+ * @returns {Lineage} the same row with those filled in when missing; every other field,
  *          including the rest of `defaults`, is left untouched
  */
 export const withLineageDefaults = (doc: Lineage): Lineage => ({
   ...doc,
+  modules: doc.modules ?? [],
   defaults: {
     ...doc.defaults,
     socials: doc.defaults.socials ?? [],

@@ -25,6 +25,7 @@ export const makeLineage = (overrides: Partial<Lineage> = {}): Lineage => ({
   description: "",
   members: [{ userId: "u1", role: "owner" }],
   orphaned: false,
+  modules: [],
   defaults: {
     mode: "osu",
     sides: { kind: "solo", lineup: 1, rosterMin: 1, rosterMax: 1, subsMax: 0 },
