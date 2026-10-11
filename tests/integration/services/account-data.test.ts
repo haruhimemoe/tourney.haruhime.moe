@@ -58,9 +58,11 @@ vi.mock("@/modules/registry", () => ({
 setupTestDb();
 
 afterEach(() => {
-  testModule.exportUser.mockClear();
+  testModule.exportUser.mockClear().mockImplementation(async (userId: string) => ({
+    seen: userId,
+  }));
   testModule.deleteUser.mockClear().mockImplementation(async () => {});
-  otherModule.exportUser.mockClear();
+  otherModule.exportUser.mockClear().mockImplementation(async () => ({}));
   otherModule.deleteUser.mockClear().mockImplementation(async () => {});
 });
 
@@ -236,6 +238,22 @@ describe("exportUser", () => {
     });
     expect(testModule.exportUser).toHaveBeenCalledWith(owner.id);
     expect(otherModule.exportUser).toHaveBeenCalledWith(owner.id);
+  });
+
+  it("keeps the rest of the export when one module's exportUser throws", async () => {
+    const { owner } = await seedLineage();
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    testModule.exportUser.mockImplementation(async () => {
+      throw new Error("boom");
+    });
+    const data = await exportUser(owner.id);
+    expect(data.modules).toEqual({
+      "test-module": { error: "export-failed" },
+      "other-module": {},
+    });
+    expect(data.lineages).toHaveLength(1);
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
   });
 
   it("leaves out editions of lineages they only admin", async () => {

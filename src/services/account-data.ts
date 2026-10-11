@@ -9,7 +9,9 @@
  *       admin; leaves lineages they own (all finished) up, orphaned; and runs every registered
  *       module's deleteUser (all of them, even if one throws; module-delete-failed only after
  *       every module has had its turn, so one bad module never stops the rest). Running it twice
- *       is fine. Export adds each module's exportUser under `modules`, keyed by module id.
+ *       is fine. Export adds each module's exportUser under `modules`, keyed by module id; a
+ *       module whose exportUser throws doesn't fail the whole export, it just leaves
+ *       `{ error: "export-failed" }` under its id (the cause is logged, not returned to the hub).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Sun Oct 11, 2026
@@ -53,7 +55,16 @@ export const exportUser = async (userId: string): Promise<AccountExport> => {
     db.registrations.find({ userId }).toArray(),
     db.availability.find({ userId }).toArray(),
     db.profiles.find({ userId }, { projection: { _id: 0 } }).toArray(),
-    Promise.all(MODULES.map(async (m) => [m.id, await m.exportUser(userId)] as const)),
+    Promise.all(
+      MODULES.map(async (m) => {
+        try {
+          return [m.id, await m.exportUser(userId)] as const;
+        } catch (cause) {
+          console.error(`module "${m.id}" failed to export account data`, cause);
+          return [m.id, { error: "export-failed" }] as const;
+        }
+      }),
+    ),
   ]);
   return {
     lineages,

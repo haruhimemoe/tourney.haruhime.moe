@@ -28,5 +28,6 @@ export type TourneyModule = {
   settingsHref?: (base: string) => string;
   unlockables?: (editionId: string) => Promise<Unlockable[]>;
   exportUser: (userId: string) => Promise<Record<string, unknown>>;
+  /** must be idempotent: the account fan-out retries every module on any module's failure */
   deleteUser: (userId: string) => Promise<void>;
 };
