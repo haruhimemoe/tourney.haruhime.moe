@@ -1,11 +1,14 @@
 /**
  * @file src/services/lineages.ts
  * @desc Lineages: create (reserved and taken slugs refused, the creator the owner), find by slug
- *       or id, each member's role, and the owner's admin list and ownership moves. A duplicate
- *       slug from a concurrent create comes back as slug-taken, never a 500. `defaults.socials`,
- *       `defaults.contact` and `defaults.hue` are optional on input; the schema fills them in.
- *       Every read runs withLineageDefaults, so a row stored before those three existed still
- *       comes back with them filled in rather than undefined.
+ *       or id, each member's role, the owner's admin list and ownership moves, and
+ *       updateLineageDefaults (merges socials/contact/hue into `defaults`, every other default
+ *       key, like mode and sides, untouched). A duplicate slug from a concurrent create comes
+ *       back as slug-taken, never a 500. `defaults.socials`, `defaults.contact` and
+ *       `defaults.hue` are optional on input; the schema fills them in. Every read runs
+ *       withLineageDefaults, so a row stored before those three existed still comes back with
+ *       them filled in rather than undefined. A lineage's defaults only seed a new edition at
+ *       creation; changing them later never touches an edition that already exists.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Sun Oct 11, 2026
@@ -131,6 +134,33 @@ const saveMembers = async (
   const next = LineageSchema.safeParse({
     ...lineage,
     members,
+    updatedAt: new Date().toISOString(),
+  });
+  if (!next.success) return fail("bad-input");
+  const { id, ...fields } = next.data;
+  await (await lineages()).replaceOne({ _id: new ObjectId(id) }, fields);
+  return ok(next.data);
+};
+
+/** The default fields a lineage settings page may change. */
+export type DefaultsPatch = Partial<Pick<Lineage["defaults"], "socials" | "contact" | "hue">>;
+
+/**
+ * @function updateLineageDefaults
+ * @param lineageId {string} the lineage
+ * @param patch {DefaultsPatch} any subset of socials, contact and hue
+ * @returns {Promise<AppResult<Lineage>>} the saved lineage, not-found, or bad-input; `mode`,
+ *          `sides` and `rulesText` in `defaults` are left exactly as they were
+ */
+export const updateLineageDefaults = async (
+  lineageId: string,
+  patch: DefaultsPatch,
+): Promise<AppResult<Lineage>> => {
+  const lineage = await getLineage(lineageId);
+  if (!lineage) return fail("not-found");
+  const next = LineageSchema.safeParse({
+    ...lineage,
+    defaults: { ...lineage.defaults, ...patch },
     updatedAt: new Date().toISOString(),
   });
   if (!next.success) return fail("bad-input");

@@ -7,7 +7,7 @@
  *       Exceptions are listed with their reason.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
@@ -24,6 +24,8 @@ const files = (dir: string): string[] =>
 const EXCEPTIONS: Record<string, string> = {
   "src/app/api/signout/route.ts": "clears a cookie",
   "src/app/api/manage/[lineage]/admins/route.ts": "members are checked live, not cached",
+  "src/app/api/manage/[lineage]/defaults/route.ts":
+    "seeds a new edition only; no public page shows a lineage's defaults",
   "src/app/api/manage/[lineage]/[edition]/matches/[code]/fill/route.ts": "a preview, saves nothing",
   "src/app/api/manage/[lineage]/[edition]/qualifiers/fill/route.ts": "a preview, saves nothing",
   "src/app/api/manage/[lineage]/[edition]/qualifiers/scores/route.ts":

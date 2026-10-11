@@ -5,7 +5,7 @@
  *       401); every new manage route adds its row here.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import type { LineageRole } from "@/schemas/lineage";
@@ -22,6 +22,7 @@ export type ManageRoute = {
 export const MANAGE_ROUTES: readonly ManageRoute[] = [
   { path: "/api/manage/lineages", method: "POST", need: "signedIn" },
   { path: "/api/manage/[lineage]/admins", method: "PATCH", need: "owner" },
+  { path: "/api/manage/[lineage]/defaults", method: "PATCH", need: "admin" },
   { path: "/api/manage/[lineage]/editions", method: "POST", need: "admin" },
   { path: "/api/manage/[lineage]/[edition]/phase", method: "POST", need: "admin" },
   { path: "/api/manage/[lineage]/[edition]/registrations/review", method: "POST", need: "admin" },
