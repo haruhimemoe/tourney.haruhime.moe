@@ -129,7 +129,13 @@ export const deleteUser = async (userId: string): Promise<AppResult<{ deleted: n
   // Every module runs, even if one fails: a settled read, not a thrown one, so the rest still
   // get their turn. Report only after all of them have gone.
   const moduleResults = await Promise.allSettled(MODULES.map((m) => m.deleteUser(userId)));
-  if (moduleResults.some((r) => r.status === "rejected")) return fail("module-delete-failed");
+  const failed = moduleResults.flatMap((r, i) => (r.status === "rejected" ? [MODULES[i]] : []));
+  if (failed.length > 0) {
+    console.error(
+      `account delete for user "${userId}" failed for modules: ${failed.map((m) => m?.id).join(", ")}`,
+    );
+    return fail("module-delete-failed");
+  }
 
   return ok({ deleted });
 };

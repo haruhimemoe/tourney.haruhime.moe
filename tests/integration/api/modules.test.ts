@@ -6,7 +6,9 @@
  *       disabling one never checks the registry, so a stale id still clears. Enabling past the
  *       32-module cap is refused 400 (the cap check rides in the same atomic update as the
  *       `$addToSet`), but enabling a module that's already one of the 32 still answers 200.
- *       Every public page the app can revalidate for a lineage is marked stale.
+ *       Every edition under the lineage is revalidated on a successful toggle (a module can
+ *       change what an edition's public pages show); a lineage with no editions falls back to
+ *       the plain list revalidate.
  *       `@/modules/registry` is mocked with a fixture module, since the real MODULES list is
  *       empty.
  * @author David @dvhsh (https://dvh.sh)
@@ -28,7 +30,8 @@ vi.mock("@/modules/registry", () => ({
 }));
 
 const revalidateLists = vi.fn();
-vi.mock("@/lib/revalidate", () => ({ revalidateLists, revalidateEdition: vi.fn() }));
+const revalidateEdition = vi.fn();
+vi.mock("@/lib/revalidate", () => ({ revalidateLists, revalidateEdition }));
 
 setupTestDb();
 
@@ -48,13 +51,28 @@ const call = async (lineageSlug: string, cookie: string | null, body: unknown) =
 };
 
 describe("PUT /api/manage/[lineage]/modules", () => {
-  it("enables a known id for an admin and marks the lists stale", async () => {
+  it("enables a known id for an admin and revalidates the lineage's edition", async () => {
     revalidateLists.mockClear();
-    const { owner, lineage } = await seedLineage();
+    revalidateEdition.mockClear();
+    const { owner, lineage, editionId } = await seedLineage();
     const res = await call(lineage.slug, owner.cookie, { id: MODULE_ID, enabled: true });
     expect(res.status).toBe(200);
     expect((await res.json()).lineage.modules).toEqual([MODULE_ID]);
+    expect(revalidateEdition).toHaveBeenCalledWith(editionId);
+    expect(revalidateLists).not.toHaveBeenCalled();
+  });
+
+  it("falls back to the plain list revalidate when the lineage has no editions", async () => {
+    revalidateLists.mockClear();
+    revalidateEdition.mockClear();
+    const { owner, lineage } = await seedLineage();
+    const { collections } = await import("@/lib/collections");
+    const { getDb } = await import("@/lib/db");
+    await collections(getDb()).editions.deleteMany({ lineageId: lineage.id });
+    const res = await call(lineage.slug, owner.cookie, { id: MODULE_ID, enabled: true });
+    expect(res.status).toBe(200);
     expect(revalidateLists).toHaveBeenCalled();
+    expect(revalidateEdition).not.toHaveBeenCalled();
   });
 
   it("is idempotent: enabling twice stays a single entry", async () => {

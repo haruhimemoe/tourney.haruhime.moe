@@ -2,9 +2,12 @@
  * @file src/components/manage/ModuleCard.tsx
  * @desc One row on the Modules tab: the module's name and description, a checkbox that PUTs the
  *       toggle to /api/manage/[lineage]/modules, and a Settings link once it's both enabled and
- *       carries a settingsHref. Not optimistic: the checkbox only flips once the route answers
+ *       carries a settingsUrl. Not optimistic: the checkbox only flips once the route answers
  *       200; a refusal (over the 32-module cap, an id gone stale) shows under the card and the
- *       checkbox stays exactly where it was.
+ *       checkbox stays exactly where it was. Takes a plain ModuleCardDto, not the registry's
+ *       TourneyModule: that type carries functions (settingsHref, exportUser, deleteUser) that
+ *       can't cross the server/client boundary, so the server page resolves them to plain data
+ *       first.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 11, 2026
  * @modified Sun Oct 11, 2026
@@ -17,26 +20,22 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { postJson } from "@/lib/manage-client";
-import type { TourneyModule } from "@/modules/types";
+import type { ModuleCardDto } from "@/lib/module-card-dto";
 
-/** ModuleCard's props: the lineage it toggles for, the module, its current state, and the base
- *  URL passed to the module's settingsHref. */
+/** ModuleCard's props: the lineage it toggles for and the module's plain, serializable fields. */
 export type ModuleCardProps = {
   lineage: string;
-  module: TourneyModule;
-  enabled: boolean;
-  /** Passed to `module.settingsHref(base)`; the Modules tab's own path for this edition. */
-  base: string;
+  card: ModuleCardDto;
 };
 
 /**
  * @function ModuleCard
- * @param props {ModuleCardProps} the lineage, module, its state and the settings link's base
+ * @param props {ModuleCardProps} the lineage and the module's plain card data
  * @returns {JSX.Element} the card
  */
-export function ModuleCard({ lineage, module, enabled: initial, base }: ModuleCardProps) {
+export function ModuleCard({ lineage, card }: ModuleCardProps) {
   const router = useRouter();
-  const [enabled, setEnabled] = useState(initial);
+  const [enabled, setEnabled] = useState(card.enabled);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,7 +43,7 @@ export function ModuleCard({ lineage, module, enabled: initial, base }: ModuleCa
     setBusy(true);
     const result = await postJson(
       `/api/manage/${lineage}/modules`,
-      { id: module.id, enabled: next },
+      { id: card.id, enabled: next },
       "PUT",
     );
     setBusy(false);
@@ -55,23 +54,20 @@ export function ModuleCard({ lineage, module, enabled: initial, base }: ModuleCa
   };
 
   return (
-    <Card title={module.name} headingLevel={3}>
+    <Card title={card.name} headingLevel={3}>
       <div className="flex items-center justify-between gap-4">
-        <p className="text-c3 text-sm">{module.description}</p>
+        <p className="text-c3 text-sm">{card.description}</p>
         <Checkbox
-          id={`module-${module.id}`}
-          label={`Turn ${module.name} on`}
+          id={`module-${card.id}`}
+          label={`Turn ${card.name} on`}
           hideLabel
           checked={enabled}
           disabled={busy}
           onChange={(e) => toggle(e.target.checked)}
         />
       </div>
-      {enabled && module.settingsHref ? (
-        <Link
-          href={module.settingsHref(base)}
-          className="coarse:inline-block coarse:py-2 text-sm underline"
-        >
+      {enabled && card.settingsUrl ? (
+        <Link href={card.settingsUrl} className="coarse:inline-block coarse:py-2 text-sm underline">
           Settings
         </Link>
       ) : null}

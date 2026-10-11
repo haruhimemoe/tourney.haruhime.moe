@@ -6,7 +6,8 @@
  *       finished lineage stays up, orphaned; export lists what they have; delete runs twice.
  *       A fixture module (`@/modules/registry` mocked) shows export keys its data under
  *       `modules`, and delete runs every module's deleteUser, reporting module-delete-failed
- *       (without skipping the others) when one throws.
+ *       (without skipping the others) and console.error-ing the failed module's id when one
+ *       throws.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Sun Oct 11, 2026
@@ -214,6 +215,22 @@ describe("deleteUser", () => {
     expect(result.ok ? null : result.error.code).toBe("module-delete-failed");
     // The other module still ran, even though test-module blew up.
     expect(otherModule.deleteUser).toHaveBeenCalledWith(player.id);
+  });
+
+  it("console.errors the failed module's id, naming only the module that rejected", async () => {
+    const { lineage, editionId } = await seedLineage();
+    const player = await createTestUser(2);
+    await moveEditionPhase(editionId, "done");
+    void lineage;
+    testModule.deleteUser.mockImplementation(async () => {
+      throw new Error("boom");
+    });
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    await deleteUser(player.id);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("test-module"));
+    const logged = errorSpy.mock.calls.map((c) => c.join(" ")).join("\n");
+    expect(logged).not.toContain("other-module");
+    errorSpy.mockRestore();
   });
 });
 

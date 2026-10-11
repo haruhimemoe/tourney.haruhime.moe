@@ -15,6 +15,7 @@ import { notFound } from "next/navigation";
 import { ModuleCard } from "@/components/manage/ModuleCard";
 import { SEO_SITE } from "@/constants/seo";
 import { requireUser } from "@/lib/auth-session";
+import { moduleCardDto } from "@/lib/module-card-dto";
 import { MODULES } from "@/modules/registry";
 import { getEdition } from "@/services/editions";
 import { memberRole } from "@/services/lineages";
@@ -54,9 +55,7 @@ export default async function ModulesSettingsPage({ params }: Props) {
         <ModuleCard
           key={mod.id}
           lineage={lineage.slug}
-          module={mod}
-          enabled={lineage.modules.includes(mod.id)}
-          base={base}
+          card={moduleCardDto(mod, base, lineage.modules.includes(mod.id))}
         />
       ))}
     </div>

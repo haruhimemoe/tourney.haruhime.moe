@@ -131,6 +131,17 @@ export const getEditionById = async (id: string): Promise<Edition | null> => {
 };
 
 /**
+ * @function editionIdsForLineage
+ * @param lineageId {string} the lineage
+ * @returns {Promise<string[]>} every edition's id under that lineage, for revalidating each
+ *          one's cached pages after a lineage-level write (e.g. a module toggle)
+ */
+export const editionIdsForLineage = async (lineageId: string): Promise<string[]> => {
+  const rows = await (await editions()).find({ lineageId }, { projection: { _id: 1 } }).toArray();
+  return rows.map((row) => row._id.toHexString());
+};
+
+/**
  * @function getEdition
  * @param lineageSlug {string} the first URL segment
  * @param slug {string} the second
