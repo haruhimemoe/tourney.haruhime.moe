@@ -1,17 +1,24 @@
 /**
  * @file tests/integration/services/lineages.test.ts
  * @desc Lineages: reserved and taken slugs are refused with their own codes (two creates at once
- *       included), the creator owns it, admins come and go, and ownership moves to an admin.
+ *       included), the creator owns it, admins come and go, and ownership moves to an admin; a
+ *       row stored before defaults.socials/contact/hue existed still reads with them filled in.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
+import { ObjectId } from "mongodb";
 import { describe, expect, it } from "vitest";
+import { collections, type Doc } from "@/lib/collections";
+import { getDb } from "@/lib/db";
+import type { Lineage } from "@/schemas/lineage";
 import {
   addAdmin,
   createLineage,
+  getLineage,
   getLineageBySlug,
+  listMemberLineages,
   memberRole,
   removeAdmin,
   transferOwner,
@@ -21,6 +28,22 @@ import { setupTestDb } from "../../helpers/db";
 import { LINEAGE_INPUT as input } from "../../helpers/inputs";
 
 setupTestDb();
+
+/** A pre-migration lineage row: no defaults.socials, defaults.contact or defaults.hue. */
+const OLD_LINEAGE_DOC = {
+  slug: "old-cup",
+  name: "Old Cup",
+  description: "",
+  members: [{ userId: "u-old", role: "owner" as const }],
+  orphaned: false,
+  defaults: {
+    mode: "osu" as const,
+    sides: { kind: "solo" as const, lineup: 1, rosterMin: 1, rosterMax: 1, subsMax: 0 },
+    rulesText: "",
+  },
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
+};
 
 const codeOf = (r: { ok: boolean; error?: { code: string } }) => (r.ok ? null : r.error?.code);
 
@@ -70,5 +93,30 @@ describe("lineages", () => {
     const removed = await removeAdmin(l.value.id, owner.id);
     expect(removed.ok && memberRole(removed.value, owner.id)).toBeNull();
     expect(codeOf(await removeAdmin(l.value.id, admin.id))).toBe("bad-input");
+  });
+
+  it("fills in defaults.socials, defaults.contact and defaults.hue on a pre-migration row", async () => {
+    const _id = new ObjectId();
+    await collections(getDb()).lineages.insertOne({
+      _id,
+      ...OLD_LINEAGE_DOC,
+    } as unknown as Doc<Lineage>);
+    const id = _id.toHexString();
+
+    const byId = await getLineage(id);
+    expect(byId?.defaults.socials).toEqual([]);
+    expect(byId?.defaults.contact).toEqual({ email: null, discord: null });
+    expect(byId?.defaults.hue).toBeNull();
+
+    const bySlug = await getLineageBySlug("old-cup");
+    expect(bySlug?.defaults.socials).toEqual([]);
+    expect(bySlug?.defaults.contact).toEqual({ email: null, discord: null });
+    expect(bySlug?.defaults.hue).toBeNull();
+
+    const listed = await listMemberLineages("u-old");
+    expect(listed).toHaveLength(1);
+    expect(listed[0]?.defaults.socials).toEqual([]);
+    expect(listed[0]?.defaults.contact).toEqual({ email: null, discord: null });
+    expect(listed[0]?.defaults.hue).toBeNull();
   });
 });

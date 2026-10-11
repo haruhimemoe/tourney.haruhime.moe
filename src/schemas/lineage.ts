@@ -2,7 +2,9 @@
  * @file src/schemas/lineage.ts
  * @desc A lineage: a tournament series (Evergreen Cup) with one owner, its admins and the
  *       defaults each new edition starts from (including socials, contact and hue). Its slug is
- *       the first URL segment, so route names are reserved.
+ *       the first URL segment, so route names are reserved. withLineageDefaults patches in those
+ *       default fields for a row written before they existed, without a full re-parse (so other
+ *       legacy drift in an old row doesn't start throwing on read).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Sun Oct 11, 2026
@@ -70,3 +72,20 @@ export const LineageSchema = z.object({
 
 /** A stored lineage. */
 export type Lineage = z.infer<typeof LineageSchema>;
+
+/**
+ * @function withLineageDefaults
+ * @param doc {Lineage} a lineage as read from storage, maybe from before `defaults.socials`,
+ *        `defaults.contact` or `defaults.hue` existed
+ * @returns {Lineage} the same row with those three filled in when missing; every other field,
+ *          including the rest of `defaults`, is left untouched
+ */
+export const withLineageDefaults = (doc: Lineage): Lineage => ({
+  ...doc,
+  defaults: {
+    ...doc.defaults,
+    socials: doc.defaults.socials ?? [],
+    contact: doc.defaults.contact ?? { email: null, discord: null },
+    hue: doc.defaults.hue ?? null,
+  },
+});

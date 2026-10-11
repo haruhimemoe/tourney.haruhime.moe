@@ -4,6 +4,8 @@
  *       or id, each member's role, and the owner's admin list and ownership moves. A duplicate
  *       slug from a concurrent create comes back as slug-taken, never a 500. `defaults.socials`,
  *       `defaults.contact` and `defaults.hue` are optional on input; the schema fills them in.
+ *       Every read runs withLineageDefaults, so a row stored before those three existed still
+ *       comes back with them filled in rather than undefined.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Sun Oct 11, 2026
@@ -14,7 +16,13 @@ import { MongoServerError, ObjectId } from "mongodb";
 import type { z } from "zod";
 import { collections, type Doc, fromId, toId } from "@/lib/collections";
 import { connectDb, getDb } from "@/lib/db";
-import { type Lineage, type LineageRole, LineageSchema, RESERVED_SLUGS } from "@/schemas/lineage";
+import {
+  type Lineage,
+  type LineageRole,
+  LineageSchema,
+  RESERVED_SLUGS,
+  withLineageDefaults,
+} from "@/schemas/lineage";
 import { type AppResult, fail, ok } from "@/utils/result";
 
 /** What a host types to make a lineage; defaults' socials, contact and hue may be left out. */
@@ -74,7 +82,7 @@ export const createLineage = async (
  */
 export const getLineageBySlug = async (slug: string): Promise<Lineage | null> => {
   const doc = await (await lineages()).findOne({ slug });
-  return doc ? toId(doc) : null;
+  return doc ? withLineageDefaults(toId(doc)) : null;
 };
 
 /**
@@ -85,7 +93,7 @@ export const getLineageBySlug = async (slug: string): Promise<Lineage | null> =>
 export const getLineage = async (id: string): Promise<Lineage | null> => {
   const _id = fromId(id);
   const doc = _id ? await (await lineages()).findOne({ _id }) : null;
-  return doc ? toId(doc) : null;
+  return doc ? withLineageDefaults(toId(doc)) : null;
 };
 
 /**
@@ -98,7 +106,7 @@ export const listMemberLineages = async (userId: string): Promise<Lineage[]> => 
     .find({ "members.userId": userId })
     .sort({ name: 1 })
     .toArray();
-  return docs.map(toId);
+  return docs.map((doc) => withLineageDefaults(toId(doc)));
 };
 
 /**

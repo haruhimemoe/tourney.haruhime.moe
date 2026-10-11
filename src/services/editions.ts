@@ -4,7 +4,9 @@
  *       the lineage owner and checked again after the insert, so two creates at once can't both
  *       get through; the lineage's socials, contact and hue defaults are copied in at creation
  *       only, never kept in sync afterward), find by lineage and edition slug, edit (the merged
- *       edition is parsed whole), and move phases through the library's advancePhase.
+ *       edition is parsed whole), and move phases through the library's advancePhase. Every read
+ *       runs withEditionDefaults, so a row stored before acronym/bannerUrl/hue/socials/contact
+ *       existed still comes back with those fields filled in rather than undefined.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Sun Oct 11, 2026
@@ -15,7 +17,7 @@ import { advancePhase, type Phase } from "@haruhimemoe/tourney";
 import { ObjectId } from "mongodb";
 import { collections, type Doc, fromId, toId } from "@/lib/collections";
 import { connectDb, getDb } from "@/lib/db";
-import { type Edition, EditionSchema, editionSlug } from "@/schemas/edition";
+import { type Edition, EditionSchema, editionSlug, withEditionDefaults } from "@/schemas/edition";
 import type { Lineage } from "@/schemas/lineage";
 import { activeEditionIds, editionLimit } from "@/services/limits";
 import { getLineage, getLineageBySlug, isDuplicateKey, memberRole } from "@/services/lineages";
@@ -125,7 +127,7 @@ export const createEdition = async (
 export const getEditionById = async (id: string): Promise<Edition | null> => {
   const _id = fromId(id);
   const doc = _id ? await (await editions()).findOne({ _id }) : null;
-  return doc ? toId(doc) : null;
+  return doc ? withEditionDefaults(toId(doc)) : null;
 };
 
 /**
@@ -141,7 +143,7 @@ export const getEdition = async (
   const lineage = await getLineageBySlug(lineageSlug);
   if (!lineage) return null;
   const doc = await (await editions()).findOne({ lineageId: lineage.id, slug });
-  return doc ? { lineage, edition: toId(doc) } : null;
+  return doc ? { lineage, edition: withEditionDefaults(toId(doc)) } : null;
 };
 
 /**

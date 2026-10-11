@@ -4,7 +4,8 @@
  *       lineage owner even when an admin creates it, exactly one of two concurrent creates
  *       through; codes that slug the same are refused; edits are parsed; phases move forward
  *       only, with the library's error; a new edition copies the lineage's social/contact/hue
- *       defaults, and a later change to those defaults leaves it alone.
+ *       defaults, and a later change to those defaults leaves it alone; a row stored before
+ *       acronym/bannerUrl/hue/socials/contact existed still reads with them filled in.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Sun Oct 11, 2026
@@ -12,8 +13,9 @@
 
 import { ObjectId } from "mongodb";
 import { describe, expect, it } from "vitest";
-import { collections } from "@/lib/collections";
+import { collections, type Doc } from "@/lib/collections";
 import { getDb } from "@/lib/db";
+import type { Edition } from "@/schemas/edition";
 import {
   createEdition,
   getEdition,
@@ -164,5 +166,48 @@ describe("editions", () => {
     );
     const reread = await getEditionById(e.value.id);
     expect(reread?.hue).toBeNull();
+  });
+
+  it("fills in acronym, bannerUrl, hue, socials and contact on a pre-migration row", async () => {
+    const { lineage } = await ownerWithLineage();
+    const _id = new ObjectId();
+    const old = {
+      lineageId: lineage.id,
+      name: "Old Edition",
+      code: "OLD2020",
+      slug: "old2020",
+      year: 2020,
+      mode: "osu" as const,
+      phase: "setup" as const,
+      sides: { kind: "solo" as const, lineup: 1, rosterMin: 1, rosterMax: 1, subsMax: 0 },
+      registration: { opensAt: null, closesAt: null, playerCap: null, staffCap: null },
+      dates: { start: null, end: null },
+      rulesText: "",
+      siteMode: "auto" as const,
+      qualifiers: { enabled: false, method: "sum" as const },
+      bracket: null,
+      eligibility: { rank: null, countries: null, regions: null },
+      questions: [],
+      pickBanRules: null,
+      archived: false,
+      createdAt: "2020-01-01T00:00:00.000Z",
+      updatedAt: "2020-01-01T00:00:00.000Z",
+    };
+    await collections(getDb()).editions.insertOne({ _id, ...old } as unknown as Doc<Edition>);
+    const id = _id.toHexString();
+
+    const byId = await getEditionById(id);
+    expect(byId?.acronym).toBeNull();
+    expect(byId?.bannerUrl).toBeNull();
+    expect(byId?.hue).toBeNull();
+    expect(byId?.socials).toEqual([]);
+    expect(byId?.contact).toEqual({ email: null, discord: null });
+
+    const found = await getEdition(lineage.slug, "old2020");
+    expect(found?.edition.acronym).toBeNull();
+    expect(found?.edition.bannerUrl).toBeNull();
+    expect(found?.edition.hue).toBeNull();
+    expect(found?.edition.socials).toEqual([]);
+    expect(found?.edition.contact).toEqual({ email: null, discord: null });
   });
 });

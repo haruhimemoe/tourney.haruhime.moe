@@ -3,7 +3,9 @@
  * @desc An edition: one run of a lineage. The library's TournamentSchema plus where it lives
  *       (lineage, slug), dates, rules, who may register, its questions, its bracket config and
  *       its settings page fields (acronym, banner, hue, socials, contact). BWS is out of v0, so
- *       eligibility has rank, countries and regions only.
+ *       eligibility has rank, countries and regions only. withEditionDefaults patches in those
+ *       settings fields for a row written before they existed, without a full re-parse (so other
+ *       legacy drift in an old row doesn't start throwing on read).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Sun Oct 11, 2026
@@ -91,3 +93,19 @@ export const EditionSchema = TournamentSchema.extend({
 
 /** A stored edition. */
 export type Edition = z.infer<typeof EditionSchema>;
+
+/**
+ * @function withEditionDefaults
+ * @param doc {Edition} an edition as read from storage, maybe from before its settings fields
+ *        existed
+ * @returns {Edition} the same row with acronym, bannerUrl, hue, socials and contact filled in
+ *          when they're missing; every other field is left untouched
+ */
+export const withEditionDefaults = (doc: Edition): Edition => ({
+  ...doc,
+  acronym: doc.acronym ?? null,
+  bannerUrl: doc.bannerUrl ?? null,
+  hue: doc.hue ?? null,
+  socials: doc.socials ?? [],
+  contact: doc.contact ?? { email: null, discord: null },
+});
