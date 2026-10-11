@@ -4,13 +4,14 @@
  *       to verify another by osu! id.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
 import { Button, Notice, Table, TBody, Td, TextInput, TextLink, THead, Th } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { postJson } from "@/lib/manage-client";
 import type { VerifiedHost } from "@/services/hosts";
@@ -21,6 +22,7 @@ import type { VerifiedHost } from "@/services/hosts";
  * @returns {JSX.Element} the list and the verify box
  */
 export function HostsTable({ hosts }: { hosts: readonly VerifiedHost[] }) {
+  const t = useTranslations("tourney.hostsTable");
   const router = useRouter();
   const [osuId, setOsuId] = useState("");
   const [busy, setBusy] = useState(false);
@@ -52,14 +54,14 @@ export function HostsTable({ hosts }: { hosts: readonly VerifiedHost[] }) {
       >
         <TextInput
           id="host-osu-id"
-          label="osu! id"
+          label={t("osuId")}
           inputMode="numeric"
           value={osuId}
           onChange={(e) => setOsuId(e.target.value)}
           disabled={busy}
         />
         <Button type="submit" disabled={busy || !typed}>
-          Verify
+          {t("verify")}
         </Button>
       </form>
       {notice ? (
@@ -68,12 +70,12 @@ export function HostsTable({ hosts }: { hosts: readonly VerifiedHost[] }) {
         </Notice>
       ) : null}
       {hosts.length ? (
-        <Table caption="Verified hosts" hideCaption>
+        <Table caption={t("verifiedHosts")} hideCaption>
           <THead>
             <tr>
-              <Th>Host</Th>
-              <Th>osu! id</Th>
-              <Th>Action</Th>
+              <Th>{t("host")}</Th>
+              <Th>{t("osuId")}</Th>
+              <Th>{t("action")}</Th>
             </tr>
           </THead>
           <TBody>
@@ -97,11 +99,11 @@ export function HostsTable({ hosts }: { hosts: readonly VerifiedHost[] }) {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        aria-label={`Remove ${name}`}
+                        aria-label={t("removeName", { name })}
                         onClick={() => void send(h.osuId as number, false, name)}
                         disabled={busy}
                       >
-                        Remove
+                        {t("remove")}
                       </Button>
                     ) : null}
                   </Td>
@@ -111,7 +113,7 @@ export function HostsTable({ hosts }: { hosts: readonly VerifiedHost[] }) {
           </TBody>
         </Table>
       ) : (
-        <p className="text-c3">No verified hosts yet.</p>
+        <p className="text-c3">{t("noVerifiedHostsYet")}</p>
       )}
     </div>
   );

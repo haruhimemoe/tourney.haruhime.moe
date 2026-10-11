@@ -6,7 +6,7 @@
  *       and offers a withdraw while registration is open.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
@@ -14,6 +14,7 @@
 import type { RegistrationStatus } from "@haruhimemoe/tourney";
 import { Button, Notice } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { type FormEvent, useState } from "react";
 import { postJson } from "@/lib/manage-client";
 import type { Question } from "@/schemas/question";
@@ -28,16 +29,6 @@ export type RegisterFormProps = {
   teamMode: boolean;
   existing: { status: RegistrationStatus; answers: Record<string, unknown> } | null;
 };
-
-const STATUS_TEXT: Record<RegistrationStatus, string> = {
-  pending: "You're registered. The hosts haven't reviewed it yet.",
-  approved: "You're registered and approved.",
-  waitlisted: "You're on the waitlist. The hosts will move you up if a place opens.",
-  rejected: "The hosts declined this registration.",
-  withdrawn: "You withdrew. You can register again while registration is open.",
-};
-
-const REQUIRED = "This question needs an answer.";
 
 const missing = (q: Question, value: unknown): boolean => {
   if (!q.required) return false;
@@ -58,6 +49,7 @@ export function RegisterForm({
   teamMode,
   existing,
 }: RegisterFormProps) {
+  const t = useTranslations("tourney.registerForm");
   const router = useRouter();
   const live = existing && existing.status !== "withdrawn" ? existing : null;
   const [status, setStatus] = useState<RegistrationStatus | null>(live?.status ?? null);
@@ -73,7 +65,7 @@ export function RegisterForm({
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     const blank = Object.fromEntries(
-      questions.filter((q) => missing(q, answers[q.id])).map((q) => [q.id, REQUIRED]),
+      questions.filter((q) => missing(q, answers[q.id])).map((q) => [q.id, t("required")]),
     );
     setErrors(blank);
     if (Object.keys(blank).length > 0) return setMessage(null);
@@ -107,7 +99,7 @@ export function RegisterForm({
     if (result.code === "already-registered") {
       const found = (result.error?.existing as { status?: RegistrationStatus } | undefined)?.status;
       setStatus(found ?? "pending");
-      setMessage("You're already registered for this edition.");
+      setMessage(t("youReAlreadyRegistered"));
       router.refresh();
       return;
     }
@@ -137,7 +129,7 @@ export function RegisterForm({
 
   return (
     <form onSubmit={submit} className="flex max-w-xl flex-col gap-4" noValidate>
-      {status ? <Notice tone="info">{STATUS_TEXT[status]}</Notice> : null}
+      {status ? <Notice tone="info">{t(`status.${status}`)}</Notice> : null}
       {teamMode && !registered ? (
         <TeamFields value={team} onChange={setTeam} disabled={busy} />
       ) : null}
@@ -161,16 +153,16 @@ export function RegisterForm({
           <>
             {questions.length > 0 ? (
               <Button type="submit" disabled={busy}>
-                Save answers
+                {t("saveAnswers")}
               </Button>
             ) : null}
             <Button type="button" variant="ghost" onClick={withdraw} disabled={busy}>
-              Withdraw
+              {t("withdraw")}
             </Button>
           </>
         ) : (
           <Button type="submit" disabled={busy}>
-            Register
+            {t("register")}
           </Button>
         )}
       </div>

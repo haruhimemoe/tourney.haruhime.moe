@@ -13,6 +13,7 @@
 
 import { Button, Notice, RadioGroup, SectionHeading, Textarea, TextInput } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { type FormEvent, useState } from "react";
 import { postJson } from "@/lib/manage-client";
 import type { Edition, SITE_MODES } from "@/schemas/edition";
@@ -29,21 +30,21 @@ export type GeneralSettingsFormProps = {
 };
 
 const SITE_MODE_OPTIONS = [
-  { value: "auto", label: "Automatic", hint: "Shows once registration opens." },
-  { value: "live", label: "Live", hint: "Always shown." },
-  { value: "hidden", label: "Hidden", hint: "Only lineage members see it." },
-] as const satisfies readonly { value: (typeof SITE_MODES)[number]; label: string; hint: string }[];
+  "auto",
+  "live",
+  "hidden",
+] as const satisfies readonly (typeof SITE_MODES)[number][];
 
 /**
  * @function hueError
  * @param text {string} the hue field's raw text
  * @returns {string | null} a field error when the text is non-empty and isn't a whole number
- *          from 0 to 359; null when it's empty (meaning "use the lineage's own") or valid
+ *          from 0 to 359 (as a catalog key); null when it's empty (meaning "use the lineage's own") or valid
  */
 const hueError = (text: string): string | null => {
   const trimmed = text.trim();
   if (!trimmed) return null;
-  if (!/^\d+$/.test(trimmed) || Number(trimmed) > 359) return "Enter a whole number from 0 to 359.";
+  if (!/^\d+$/.test(trimmed) || Number(trimmed) > 359) return "hueRange";
   return null;
 };
 
@@ -63,6 +64,7 @@ const toHue = (text: string): number | null => {
  * @returns {JSX.Element} the form
  */
 export function GeneralSettingsForm({ lineage, edition, initial }: GeneralSettingsFormProps) {
+  const t = useTranslations("tourney.generalSettingsForm");
   const router = useRouter();
   const [name, setName] = useState(initial.name);
   const [acronym, setAcronym] = useState(initial.acronym ?? "");
@@ -80,7 +82,7 @@ export function GeneralSettingsForm({ lineage, edition, initial }: GeneralSettin
     event.preventDefault();
     const error = hueError(hue);
     if (error) {
-      setHueFieldError(error);
+      setHueFieldError(t(error));
       return;
     }
     setHueFieldError(null);
@@ -100,18 +102,18 @@ export function GeneralSettingsForm({ lineage, edition, initial }: GeneralSettin
     );
     setBusy(false);
     if (!result.ok) return setNotice({ tone: "error", text: result.message });
-    setNotice({ tone: "info", text: "Saved." });
+    setNotice({ tone: "info", text: t("saved") });
     router.refresh();
   };
 
   return (
     <form onSubmit={save} className="flex max-w-2xl flex-col gap-6">
       <section className="flex flex-col gap-4">
-        <SectionHeading>Name and dates</SectionHeading>
+        <SectionHeading>{t("nameAndDates")}</SectionHeading>
         <div className="flex flex-wrap gap-3">
           <TextInput
             id="general-name"
-            label="Edition name"
+            label={t("editionName")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             disabled={busy}
@@ -119,8 +121,8 @@ export function GeneralSettingsForm({ lineage, edition, initial }: GeneralSettin
           />
           <TextInput
             id="general-acronym"
-            label="Acronym"
-            hint="Shown next to the name, 12 characters at most."
+            label={t("acronym")}
+            hint={t("shownNextToThe")}
             maxLength={12}
             value={acronym}
             onChange={(e) => setAcronym(e.target.value)}
@@ -130,16 +132,16 @@ export function GeneralSettingsForm({ lineage, edition, initial }: GeneralSettin
         <div className="flex flex-wrap gap-3">
           <TextInput
             id="general-start"
-            label="Starts"
+            label={t("starts")}
             type="datetime-local"
-            hint="In your time zone."
+            hint={t("inYourTimeZone")}
             value={start}
             onChange={(e) => setStart(e.target.value)}
             disabled={busy}
           />
           <TextInput
             id="general-end"
-            label="Ends"
+            label={t("ends")}
             type="datetime-local"
             value={end}
             onChange={(e) => setEnd(e.target.value)}
@@ -148,10 +150,10 @@ export function GeneralSettingsForm({ lineage, edition, initial }: GeneralSettin
         </div>
       </section>
       <section className="flex flex-col gap-4">
-        <SectionHeading>Look</SectionHeading>
+        <SectionHeading>{t("look")}</SectionHeading>
         <TextInput
           id="general-banner"
-          label="Banner URL"
+          label={t("bannerUrl")}
           type="url"
           value={bannerUrl}
           onChange={(e) => setBannerUrl(e.target.value)}
@@ -159,8 +161,8 @@ export function GeneralSettingsForm({ lineage, edition, initial }: GeneralSettin
         />
         <TextInput
           id="general-hue"
-          label="Hue"
-          hint="0 to 359. Empty for the lineage's own."
+          label={t("hue")}
+          hint={t("n0To359Empty")}
           inputMode="numeric"
           value={hue}
           onChange={(e) => {
@@ -172,11 +174,11 @@ export function GeneralSettingsForm({ lineage, edition, initial }: GeneralSettin
         />
       </section>
       <section className="flex flex-col gap-4">
-        <SectionHeading>Rules</SectionHeading>
+        <SectionHeading>{t("rules")}</SectionHeading>
         <Textarea
           id="general-rules"
-          label="Rules text"
-          hint="Markdown."
+          label={t("rulesText")}
+          hint={t("markdown")}
           rows={8}
           value={rulesText}
           onChange={(e) => setRulesText(e.target.value)}
@@ -184,10 +186,14 @@ export function GeneralSettingsForm({ lineage, edition, initial }: GeneralSettin
         />
       </section>
       <section className="flex flex-col gap-4">
-        <SectionHeading>Public page</SectionHeading>
+        <SectionHeading>{t("publicPage")}</SectionHeading>
         <RadioGroup
-          label="Site visibility"
-          options={SITE_MODE_OPTIONS}
+          label={t("siteVisibility")}
+          options={SITE_MODE_OPTIONS.map((value) => ({
+            value,
+            label: t(`modes.${value}.label`),
+            hint: t(`modes.${value}.hint`),
+          }))}
           value={siteMode}
           onChange={(value) => setSiteMode(value as (typeof SITE_MODES)[number])}
           disabled={busy}
@@ -200,7 +206,7 @@ export function GeneralSettingsForm({ lineage, edition, initial }: GeneralSettin
       ) : null}
       <div>
         <Button type="submit" disabled={busy}>
-          Save settings
+          {t("saveSettings")}
         </Button>
       </div>
     </form>

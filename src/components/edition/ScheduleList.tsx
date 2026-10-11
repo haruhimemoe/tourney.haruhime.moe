@@ -12,6 +12,7 @@
 "use client";
 
 import { SectionHeading, TextLink } from "@haruhimemoe/ui";
+import { useLocale, useTranslations } from "next-intl";
 import { formatDay, formatTime } from "@/utils/zoned-time";
 import { useViewerZone } from "./LocalTime";
 
@@ -35,15 +36,15 @@ export type ScheduleListProps = {
   hourCycle?: "h12" | "h23" | null | undefined;
 };
 
-const UNSCHEDULED = "Not scheduled yet";
-
 /**
  * @function ScheduleList
  * @param props {ScheduleListProps} the rows
  * @returns {JSX.Element} one section per day
  */
 export function ScheduleList({ rows, base, zone, hourCycle }: ScheduleListProps) {
+  const t = useTranslations("tourney.scheduleList");
   const viewer = useViewerZone(zone);
+  const locale = useLocale();
   const sorted = [...rows].sort(
     (x, y) =>
       (x.scheduledAt ? Date.parse(x.scheduledAt) : Number.POSITIVE_INFINITY) -
@@ -52,10 +53,10 @@ export function ScheduleList({ rows, base, zone, hourCycle }: ScheduleListProps)
   );
   const days = new Map<string, ScheduleListRow[]>();
   for (const row of sorted) {
-    const day = row.scheduledAt ? formatDay(row.scheduledAt, viewer) : UNSCHEDULED;
+    const day = row.scheduledAt ? formatDay(row.scheduledAt, viewer, locale) : t("unscheduled");
     days.set(day, [...(days.get(day) ?? []), row]);
   }
-  if (!rows.length) return <p className="text-c3">No matches yet.</p>;
+  if (!rows.length) return <p className="text-c3">{t("noMatchesYet")}</p>;
   return (
     <div className="flex flex-col gap-6">
       <p className="text-c3 text-sm">Times in {viewer}.</p>
@@ -67,7 +68,7 @@ export function ScheduleList({ rows, base, zone, hourCycle }: ScheduleListProps)
               <li key={r.code} className="flex flex-wrap items-baseline gap-x-3">
                 <span className="w-14 text-c3 tabular-nums">
                   {r.scheduledAt
-                    ? formatTime(r.scheduledAt, viewer, hourCycle ?? null)
+                    ? formatTime(r.scheduledAt, viewer, hourCycle ?? null, locale)
                         .split(", ")
                         .at(-1)
                     : "-"}

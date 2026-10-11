@@ -5,7 +5,7 @@
  *       registry; anything else 404s.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { contentParams, contentPath, findEntry, markdownPath } from "@haruhimemoe/next-kit/docs";

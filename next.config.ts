@@ -7,12 +7,15 @@
  *       and legal page's Markdown mirror is served at <path>.md (next-kit's contentRewrites).
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { contentRewrites } from "@haruhimemoe/next-kit/docs";
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 // Turbopack only takes MDX plugins as module names, not imported functions. remark-gfm adds pipe
 // tables, task lists and strikethrough.
@@ -60,4 +63,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withMDX(nextConfig);
+export default withNextIntl(withMDX(nextConfig));

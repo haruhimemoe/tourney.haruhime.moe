@@ -5,13 +5,14 @@
  *       it (the wrong lobby looks exactly like that); other problems are shown for information.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
 import type { MatchProblem, MatchProblemCode } from "@haruhimemoe/tourney/mp";
 import { Checkbox, Notice } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 
 /** Problems that stop Save until the host acknowledges them. */
 export const BLOCKING_PROBLEMS: readonly MatchProblemCode[] = ["unknown-player", "off-pool"];
@@ -44,6 +45,7 @@ export function MpFillPreview({
   acknowledged,
   onAcknowledge,
 }: MpFillPreviewProps) {
+  const t = useTranslations("tourney.mpFillPreview");
   return (
     <div className="flex flex-col gap-2">
       <Notice tone="info">
@@ -61,7 +63,7 @@ export function MpFillPreview({
                 {BLOCKING_PROBLEMS.includes(p.code) ? (
                   <Checkbox
                     id={`ack-${key.replace(/\W+/g, "-")}`}
-                    label="I checked this, save anyway"
+                    label={t("iCheckedThisSave")}
                     checked={acknowledged.has(key)}
                     onChange={(e) => onAcknowledge(key, e.target.checked)}
                   />

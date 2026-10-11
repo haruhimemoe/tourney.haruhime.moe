@@ -3,11 +3,12 @@
  * @desc Final places from the main bracket: placed teams by place, teams still playing after.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import type { Placement } from "@haruhimemoe/tourney";
 import { Table, TBody, Td, THead, Th } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 
 /** ResultsTable's props: the results and the names of entrant ids. */
 export type ResultsTableProps = {
@@ -21,16 +22,17 @@ export type ResultsTableProps = {
  * @returns {JSX.Element} the table, or a line saying there are none yet
  */
 export function ResultsTable({ results, names }: ResultsTableProps) {
-  if (!results.placements.length) return <p className="text-c3">No results yet.</p>;
+  const t = useTranslations("tourney.resultsTable");
+  if (!results.placements.length) return <p className="text-c3">{t("noResultsYet")}</p>;
   const rows = [...results.placements].sort(
     (x, y) => (x.place ?? Number.POSITIVE_INFINITY) - (y.place ?? Number.POSITIVE_INFINITY),
   );
   return (
-    <Table caption="Results" hideCaption>
+    <Table caption={t("results")} hideCaption>
       <THead>
         <tr>
-          <Th>Place</Th>
-          <Th>Team</Th>
+          <Th>{t("place")}</Th>
+          <Th>{t("team")}</Th>
         </tr>
       </THead>
       <TBody>

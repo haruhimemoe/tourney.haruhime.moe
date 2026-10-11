@@ -13,6 +13,7 @@
 
 import { Button, Notice, Table, TBody, Td, TextInput, TextLink, THead, Th } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { postJson } from "@/lib/manage-client";
 import { fromLocalInput, toLocalInput } from "@/utils/local-time";
@@ -42,6 +43,9 @@ export type ScheduleTableProps = {
  * @returns {JSX.Element} the table with its scheduling actions
  */
 export function ScheduleTable({ lineage, edition, rows, zone, hourCycle }: ScheduleTableProps) {
+  const t = useTranslations("tourney.scheduleTable");
+  const tc = useTranslations("tourney.common");
+  const locale = useLocale();
   const router = useRouter();
   // The server doesn't know the viewer's zone: UTC until the browser says, so hydration matches.
   const [viewerZone, setViewerZone] = useState(zone ?? "UTC");
@@ -81,8 +85,8 @@ export function ScheduleTable({ lineage, edition, rows, zone, hourCycle }: Sched
       (data) => {
         setOptions((prev) => ({ ...prev, [code]: data.suggestions.map((s) => s.start) }));
         return data.suggestions.length
-          ? `${data.suggestions.length} times for ${code}.`
-          : `No time in the window suits both sides of ${code}.`;
+          ? t("suggestions", { count: data.suggestions.length, code })
+          : t("noSuggestion", { code });
       },
     );
 
@@ -90,12 +94,17 @@ export function ScheduleTable({ lineage, edition, rows, zone, hourCycle }: Sched
     run(
       () => postJson<{ filled: number; skipped: string[] }>(`${base}/schedule/suggest`, { round }),
       (data) =>
-        `Filled ${data.filled} in ${round}.${data.skipped.length ? ` Left: ${data.skipped.join(", ")}.` : ""}`,
+        [
+          t("filled", { count: data.filled, round }),
+          data.skipped.length ? t("left", { codes: data.skipped.join(", ") }) : "",
+        ]
+          .join(" ")
+          .trim(),
     );
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-c3 text-sm">Times in {viewerZone}.</p>
+      <p className="text-c3 text-sm">{t("timesIn", { zone: viewerZone })}</p>
       <div className="flex flex-wrap gap-2">
         {rounds.map((r) => (
           <Button
@@ -115,14 +124,14 @@ export function ScheduleTable({ lineage, edition, rows, zone, hourCycle }: Sched
           {notice.text}
         </Notice>
       ) : null}
-      <Table caption="Schedule" hideCaption>
+      <Table caption={t("schedule")} hideCaption>
         <THead>
           <tr>
-            <Th>Match</Th>
-            <Th>Round</Th>
-            <Th>Sides</Th>
-            <Th>Time</Th>
-            <Th>Set time</Th>
+            <Th>{t("match")}</Th>
+            <Th>{t("round")}</Th>
+            <Th>{t("sides")}</Th>
+            <Th>{t("time")}</Th>
+            <Th>{t("setTime")}</Th>
           </tr>
         </THead>
         <TBody>
@@ -134,19 +143,17 @@ export function ScheduleTable({ lineage, edition, rows, zone, hourCycle }: Sched
                 </TextLink>
               </Td>
               <Td>{r.round}</Td>
-              <Td>
-                {r.a ?? "TBD"} vs {r.b ?? "TBD"}
-              </Td>
+              <Td>{tc("versus", { a: r.a ?? tc("tbd"), b: r.b ?? tc("tbd") })}</Td>
               <Td>
                 {r.scheduledAt
-                  ? formatTime(r.scheduledAt, viewerZone, hourCycle ?? null)
-                  : "Not set"}
+                  ? formatTime(r.scheduledAt, viewerZone, hourCycle ?? null, locale)
+                  : tc("notSet")}
               </Td>
               <Td>
                 <div className="flex flex-wrap items-center gap-2">
                   <TextInput
                     id={`time-${r.code}`}
-                    label={`Time of ${r.code}`}
+                    label={t("timeOfCode", { code: r.code })}
                     hideLabel
                     type="datetime-local"
                     value={drafts[r.code] ?? ""}
@@ -159,7 +166,7 @@ export function ScheduleTable({ lineage, edition, rows, zone, hourCycle }: Sched
                     onClick={() => setTime(r.code, fromLocalInput(drafts[r.code] ?? ""))}
                     disabled={busy}
                   >
-                    Save
+                    {t("save")}
                   </Button>
                   {r.a && r.b ? (
                     <Button
@@ -169,7 +176,7 @@ export function ScheduleTable({ lineage, edition, rows, zone, hourCycle }: Sched
                       onClick={() => suggest(r.code)}
                       disabled={busy}
                     >
-                      Suggest
+                      {t("suggest")}
                     </Button>
                   ) : null}
                   {(options[r.code] ?? []).map((start) => (
@@ -181,7 +188,7 @@ export function ScheduleTable({ lineage, edition, rows, zone, hourCycle }: Sched
                       onClick={() => setTime(r.code, start)}
                       disabled={busy}
                     >
-                      {formatTime(start, viewerZone, hourCycle ?? null)}
+                      {formatTime(start, viewerZone, hourCycle ?? null, locale)}
                     </Button>
                   ))}
                 </div>

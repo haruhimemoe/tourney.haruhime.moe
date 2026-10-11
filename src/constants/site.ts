@@ -7,7 +7,7 @@
  *       sign-in's landing.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { SHARED_MARKER_COOKIE } from "@haruhimemoe/next-kit/auth-react";
@@ -55,39 +55,56 @@ export const HUB_COOKIE_DOMAIN = ".haruhime.moe";
  * when it's there. tourney only reads it. */
 export const SIGNED_IN_COOKIE = SHARED_MARKER_COOKIE;
 
-/** The header's links. */
-export const NAV_LINKS: readonly { href: string; label: string }[] = [
-  { href: "/", label: "Home" },
-  { href: "/browse", label: "Browse" },
-  { href: "/manage/new", label: "Host a tournament" },
+/** A translator: next-intl's t for "tourney" or "common". */
+type T = (key: string) => string;
+
+/**
+ * @function navLinks
+ * @param t {T} the "tourney" translator
+ * @returns {{ href: string; label: string }[]} the header's links
+ */
+export const navLinks = (t: T): { href: string; label: string }[] => [
+  { href: "/", label: t("nav.home") },
+  { href: "/browse", label: t("nav.browse") },
+  { href: "/manage/new", label: t("nav.host") },
 ];
 
-/** The header's account menu links, above Sign out. */
-export const ACCOUNT_MENU_ITEMS: readonly { href: string; label: string }[] = [
-  { href: "/", label: "Your tournaments" },
-  { href: "/account", label: "tourney settings" },
+/**
+ * @function accountMenuItems
+ * @param t {T} the "tourney" translator
+ * @returns {{ href: string; label: string }[]} the header's account menu links, above Sign out
+ */
+export const accountMenuItems = (t: T): { href: string; label: string }[] => [
+  { href: "/", label: t("nav.yours") },
+  { href: "/account", label: t("nav.settings") },
 ];
 
-/** The footer's own link columns: tourney, About and Legal (ui adds "haruhime tools"). */
-export const FOOTER_COLUMNS: readonly SiteFooterColumn[] = [
+/**
+ * @function footerColumns
+ * @param t {T} the "tourney" translator
+ * @param common {T} the "common" translator
+ * @returns {SiteFooterColumn[]} the footer's own link columns: tourney, About and Legal (ui adds
+ *          "haruhime tools"). Legal page titles stay English, like the pages.
+ */
+export const footerColumns = (t: T, common: T): SiteFooterColumn[] => [
   {
     title: "tourney",
     items: [
-      { href: "/browse", label: "Browse" },
-      { href: "/manage/new", label: "Host a tournament" },
-      { href: "/docs", label: "Docs" },
-      { href: "/credits", label: "Credits" },
+      { href: "/browse", label: t("nav.browse") },
+      { href: "/manage/new", label: t("nav.host") },
+      { href: "/docs", label: t("nav.docs") },
+      { href: "/credits", label: t("nav.credits") },
     ],
   },
   {
-    title: "About",
+    title: common("footer.about"),
     items: [
-      { href: SITE.repoUrl, label: "Source on GitHub" },
+      { href: SITE.repoUrl, label: common("footer.source") },
       { href: `mailto:${SITE.contactEmail}`, label: SITE.contactEmail },
     ],
   },
   {
-    title: "Legal",
+    title: common("footer.legal"),
     items: CONTENT.entries.legal.map(({ slug, title }) => ({
       href: contentPath("legal", slug),
       label: title,

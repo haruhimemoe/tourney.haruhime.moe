@@ -5,13 +5,14 @@
  *       they came; typed rows have none. Controlled.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
 import type { MapResult } from "@haruhimemoe/tourney";
 import { Button, Checkbox, Select } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 
 /** MapResultsEditor's props: the maps, the pool's slots and the sides' names. */
 export type MapResultsEditorProps = {
@@ -34,6 +35,7 @@ export function MapResultsEditor({
   names,
   disabled,
 }: MapResultsEditorProps) {
+  const t = useTranslations("tourney.mapResultsEditor");
   const set = (i: number, change: Partial<MapResult>) =>
     onChange(value.map((m, j) => (j === i ? { ...m, ...change } : m)));
   const add = () =>
@@ -58,13 +60,13 @@ export function MapResultsEditor({
         <div key={i} className="flex flex-wrap items-end gap-2">
           <Select
             id={`map-slot-${i}`}
-            label={`Map ${i + 1}`}
+            label={t("mapI", { i: i + 1 })}
             value={m.slot}
             onChange={(e) => set(i, { slot: e.target.value })}
             disabled={disabled}
           >
             {slots.some((s) => s.slotKey === m.slot) ? null : (
-              <option value={m.slot}>{label(m.slot) || "Pick a slot"}</option>
+              <option value={m.slot}>{label(m.slot) || t("pickSlot")}</option>
             )}
             {slots.map((s) => (
               <option key={s.slotKey} value={s.slotKey}>
@@ -74,25 +76,25 @@ export function MapResultsEditor({
           </Select>
           <Select
             id={`map-winner-${i}`}
-            label={`Winner of map ${i + 1}`}
+            label={t("winnerOfMapI", { i: i + 1 })}
             value={m.winner ?? ""}
             onChange={(e) => set(i, { winner: (e.target.value || null) as MapResult["winner"] })}
             disabled={disabled}
           >
-            <option value="">None</option>
+            <option value="">{t("none")}</option>
             <option value="a">{names.a}</option>
             <option value="b">{names.b}</option>
           </Select>
           <Checkbox
             id={`map-warmup-${i}`}
-            label="Warmup"
+            label={t("warmup")}
             checked={m.warmup}
             onChange={(e) => set(i, { warmup: e.target.checked })}
             disabled={disabled}
           />
           <Checkbox
             id={`map-aborted-${i}`}
-            label="Aborted"
+            label={t("aborted")}
             checked={m.aborted}
             onChange={(e) => set(i, { aborted: e.target.checked })}
             disabled={disabled}
@@ -104,13 +106,13 @@ export function MapResultsEditor({
             onClick={() => onChange(value.filter((_, j) => j !== i))}
             disabled={disabled}
           >
-            Remove
+            {t("remove")}
           </Button>
         </div>
       ))}
       <div>
         <Button type="button" variant="ghost" size="sm" onClick={add} disabled={disabled}>
-          Add map
+          {t("addMap")}
         </Button>
       </div>
     </div>

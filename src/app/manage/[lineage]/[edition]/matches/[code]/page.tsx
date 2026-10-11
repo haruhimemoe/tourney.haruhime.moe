@@ -5,13 +5,14 @@
  *       typed in.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { Notice, PageHeader } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { MatchEditor } from "@/components/manage/MatchEditor";
 import { SEO_SITE } from "@/constants/seo";
 import { requireUser } from "@/lib/auth-session";
@@ -44,6 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * @returns {Promise<JSX.Element>} the match editor
  */
 export default async function MatchPage({ params }: Props) {
+  const t = await getTranslations("tourney.pages.manageLineageEditionMatchesCode");
   const { lineage: lineageSlug, edition: editionSlug, code } = await params;
   const user = await requireUser(`/manage/${lineageSlug}/${editionSlug}/matches/${code}`);
   const found = await getEdition(lineageSlug, editionSlug);
@@ -58,16 +60,17 @@ export default async function MatchPage({ params }: Props) {
     pool?.ok === true
       ? pool.value.slots.map((s) => ({ slotKey: s.slotKey, label: `${s.mod ?? ""}${s.index}` }))
       : [];
-  const side = (id: string | null) => (id ? (names.get(id) ?? "Unknown team") : "TBD");
+  const tc = await getTranslations("tourney.common");
+  const side = (id: string | null) => (id ? (names.get(id) ?? tc("unknownTeam")) : tc("tbd"));
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title={`${match.bracketCode ?? code}: ${side(match.a)} vs ${side(match.b)}`}
+        title={`${match.bracketCode ?? code}: ${tc("versus", { a: side(match.a), b: side(match.b) })}`}
         lead={`${edition.name}, ${round?.name ?? match.round}`}
-        meta={`Status: ${match.status}`}
+        meta={t("statusStatus", { status: match.status })}
       />
       {!round?.poolId ? (
-        <Notice tone="info">This round has no pool linked, so type the score in.</Notice>
+        <Notice tone="info">{t("thisRoundHasNo")}</Notice>
       ) : pool && !pool.ok ? (
         <Notice tone="error">{pool.error.message}</Notice>
       ) : null}
@@ -91,7 +94,7 @@ export default async function MatchPage({ params }: Props) {
           pickBans={edition.pickBanRules !== null}
         />
       ) : (
-        <Notice tone="info">Both sides have to be known before a result can go in.</Notice>
+        <Notice tone="info">{t("bothSidesHaveTo")}</Notice>
       )}
     </div>
   );

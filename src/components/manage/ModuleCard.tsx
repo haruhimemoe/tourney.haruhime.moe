@@ -18,6 +18,7 @@
 import { Card, Checkbox, Notice } from "@haruhimemoe/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { postJson } from "@/lib/manage-client";
 import type { ModuleCardDto } from "@/lib/module-card-dto";
@@ -34,6 +35,7 @@ export type ModuleCardProps = {
  * @returns {JSX.Element} the card
  */
 export function ModuleCard({ lineage, card }: ModuleCardProps) {
+  const t = useTranslations("tourney.moduleCard");
   const router = useRouter();
   const [enabled, setEnabled] = useState(card.enabled);
   const [busy, setBusy] = useState(false);
@@ -59,7 +61,7 @@ export function ModuleCard({ lineage, card }: ModuleCardProps) {
         <p className="text-c3 text-sm">{card.description}</p>
         <Checkbox
           id={`module-${card.id}`}
-          label={`Turn ${card.name} on`}
+          label={t("turnNameOn", { name: card.name })}
           hideLabel
           checked={enabled}
           disabled={busy}
@@ -68,7 +70,7 @@ export function ModuleCard({ lineage, card }: ModuleCardProps) {
       </div>
       {enabled && card.settingsUrl ? (
         <Link href={card.settingsUrl} className="coarse:inline-block coarse:py-2 text-sm underline">
-          Settings
+          {t("settings")}
         </Link>
       ) : null}
       {error ? <Notice tone="error">{error}</Notice> : null}

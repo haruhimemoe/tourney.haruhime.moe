@@ -12,6 +12,7 @@
 
 import { PageHeader } from "@haruhimemoe/ui";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 import { SettingsTabs } from "@/components/manage/SettingsTabs";
 import { requireUser } from "@/lib/auth-session";
@@ -26,6 +27,7 @@ type Props = { children: ReactNode; params: Promise<{ lineage: string; edition: 
  * @returns {Promise<JSX.Element>} the header, tabs and the tab's content
  */
 export default async function EditionSettingsLayout({ children, params }: Props) {
+  const t = await getTranslations("tourney.pages.manageLineageEditionSettingsLayout");
   const { lineage: lineageSlug, edition: editionSlug } = await params;
   const user = await requireUser(`/manage/${lineageSlug}/${editionSlug}/settings`);
   const found = await getEdition(lineageSlug, editionSlug);
@@ -34,7 +36,7 @@ export default async function EditionSettingsLayout({ children, params }: Props)
   const base = `/manage/${lineage.slug}/${edition.slug}/settings`;
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Edition settings" lead={edition.name} />
+      <PageHeader title={t("editionSettings")} lead={edition.name} />
       <SettingsTabs base={base} />
       {children}
     </div>

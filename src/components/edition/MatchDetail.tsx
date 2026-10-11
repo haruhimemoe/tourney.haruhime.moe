@@ -8,6 +8,7 @@
  */
 
 import { SectionHeading, StatList, TextLink } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 import type { PublicMatch } from "@/services/public-view";
 import { LocalTime } from "./LocalTime";
 
@@ -19,8 +20,6 @@ export type MatchDetailProps = {
   zone?: string | null | undefined;
   hourCycle?: "h12" | "h23" | null | undefined;
 };
-
-const VERB = { protect: "protects", ban: "bans", pick: "picks", tiebreaker: "tiebreaker" } as const;
 
 /**
  * @function slotLabel
@@ -35,48 +34,49 @@ export const slotLabel = (slot: string): string => slot.replace(/^[a-z]+:/, "").
  * @returns {JSX.Element} the match's details
  */
 export function MatchDetail({ match, names, zone, hourCycle }: MatchDetailProps) {
-  const side = (s: "a" | "b" | null) => (s ? names[s] : "Tiebreaker");
+  const t = useTranslations("tourney.matchDetail");
+  const side = (s: "a" | "b" | null) => (s ? names[s] : t("tiebreaker"));
   const links = [
     ...match.mpLinks.map((href, i) => ({
       href,
-      label: match.mpLinks.length > 1 ? `mp ${i + 1}` : "mp link",
+      label: match.mpLinks.length > 1 ? t("mp", { n: i + 1 }) : t("mpLink"),
     })),
-    ...(match.streamUrl ? [{ href: match.streamUrl, label: "Stream" }] : []),
-    ...(match.vodUrl ? [{ href: match.vodUrl, label: "VOD" }] : []),
+    ...(match.streamUrl ? [{ href: match.streamUrl, label: t("stream") }] : []),
+    ...(match.vodUrl ? [{ href: match.vodUrl, label: t("vod") }] : []),
   ];
   return (
     <div className="flex flex-col gap-6">
       <StatList
         items={[
-          { label: "Round", value: match.round },
-          { label: "Best of", value: match.bestOf },
+          { label: t("round"), value: match.round },
+          { label: t("bestOf"), value: match.bestOf },
           {
-            label: "Time",
+            label: t("time"),
             value: match.scheduledAt ? (
               <LocalTime at={match.scheduledAt} zone={zone} hourCycle={hourCycle} />
             ) : (
-              "Not set"
+              t("notSet")
             ),
           },
           {
-            label: "Score",
+            label: t("score"),
             value:
               match.scoreA !== null && match.scoreB !== null
                 ? `${match.scoreA} - ${match.scoreB}`
-                : "Not played",
+                : t("notPlayed"),
           },
         ]}
       />
       {match.pickBans.length ? (
         <section className="flex flex-col gap-2">
-          <SectionHeading>Picks and bans</SectionHeading>
-          <ol aria-label="Picks and bans" className="list-decimal pl-6">
+          <SectionHeading>{t("picksAndBans")}</SectionHeading>
+          <ol aria-label={t("picksAndBans")} className="list-decimal pl-6">
             {match.pickBans.map((e, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: the order is the identity
               <li key={i}>
                 {e.action === "tiebreaker"
-                  ? `Tiebreaker ${slotLabel(e.slot)}`
-                  : `${side(e.side)} ${VERB[e.action]} ${slotLabel(e.slot)}`}
+                  ? t("tiebreakerSlot", { slot: slotLabel(e.slot) })
+                  : t("action", { side: side(e.side), action: e.action, slot: slotLabel(e.slot) })}
               </li>
             ))}
           </ol>
@@ -84,8 +84,8 @@ export function MatchDetail({ match, names, zone, hourCycle }: MatchDetailProps)
       ) : null}
       {match.maps.length ? (
         <section className="flex flex-col gap-2">
-          <SectionHeading>Maps</SectionHeading>
-          <ol aria-label="Maps" className="list-decimal pl-6">
+          <SectionHeading>{t("maps")}</SectionHeading>
+          <ol aria-label={t("maps")} className="list-decimal pl-6">
             {match.maps.map((m, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: the order is the identity
               <li key={i}>

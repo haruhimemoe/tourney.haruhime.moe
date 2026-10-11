@@ -5,7 +5,7 @@
  *       are local week slots (day * 24 + hour, Monday 0); the caller converts and saves.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";

@@ -12,6 +12,7 @@
 
 import { Button, Notice, TextInput } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { type FormEvent, useState } from "react";
 import { postJson } from "@/lib/manage-client";
 import type { Contact } from "@/schemas/social";
@@ -25,6 +26,7 @@ export type ContactFormProps = { lineage: string; edition: string; initial: Cont
  * @returns {JSX.Element} the form
  */
 export function ContactForm({ lineage, edition, initial }: ContactFormProps) {
+  const t = useTranslations("tourney.contactForm");
   const router = useRouter();
   const [email, setEmail] = useState(initial.email ?? "");
   const [discord, setDiscord] = useState(initial.discord ?? "");
@@ -41,7 +43,7 @@ export function ContactForm({ lineage, edition, initial }: ContactFormProps) {
     );
     setBusy(false);
     if (!result.ok) return setNotice({ tone: "error", text: result.message });
-    setNotice({ tone: "info", text: "Saved." });
+    setNotice({ tone: "info", text: t("saved") });
     router.refresh();
   };
 
@@ -49,17 +51,17 @@ export function ContactForm({ lineage, edition, initial }: ContactFormProps) {
     <form onSubmit={save} className="flex max-w-md flex-col gap-4">
       <TextInput
         id="contact-email"
-        label="Email"
+        label={t("email")}
         type="email"
-        hint="Shown on the public tournament page."
+        hint={t("shownOnThePublic")}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         disabled={busy}
       />
       <TextInput
         id="contact-discord"
-        label="Discord handle"
-        hint="How players reach you, not a server invite (that goes in Socials). Shown on the public tournament page."
+        label={t("discordHandle")}
+        hint={t("howPlayersReachYou")}
         maxLength={40}
         value={discord}
         onChange={(e) => setDiscord(e.target.value)}
@@ -72,7 +74,7 @@ export function ContactForm({ lineage, edition, initial }: ContactFormProps) {
       ) : null}
       <div>
         <Button type="submit" disabled={busy}>
-          Save contact
+          {t("saveContact")}
         </Button>
       </div>
     </form>

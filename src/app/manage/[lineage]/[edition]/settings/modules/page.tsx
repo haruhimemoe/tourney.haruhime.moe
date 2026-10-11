@@ -12,6 +12,7 @@ import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { EmptyState } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ModuleCard } from "@/components/manage/ModuleCard";
 import { SEO_SITE } from "@/constants/seo";
 import { requireUser } from "@/lib/auth-session";
@@ -42,12 +43,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * @returns {Promise<JSX.Element>} one card per registered module, or the empty state
  */
 export default async function ModulesSettingsPage({ params }: Props) {
+  const t = await getTranslations("tourney.pages.manageLineageEditionSettingsModules");
   const { lineage: lineageSlug, edition: editionSlug } = await params;
   const user = await requireUser(`/manage/${lineageSlug}/${editionSlug}/settings/modules`);
   const found = await getEdition(lineageSlug, editionSlug);
   if (!found || !memberRole(found.lineage, user.id)) notFound();
   const { lineage, edition } = found;
-  if (MODULES.length === 0) return <EmptyState>No modules available yet.</EmptyState>;
+  if (MODULES.length === 0) return <EmptyState>{t("noModulesAvailableYet")}</EmptyState>;
   const base = `/manage/${lineage.slug}/${edition.slug}/settings/modules`;
   return (
     <div className="flex flex-col gap-4">

@@ -17,20 +17,23 @@ import { formatInstant } from "@haruhimemoe/next-kit/preferences";
  * @function formatTime
  * @param iso {string} an instant
  * @param zone {string} an IANA zone
- * @param hourCycle {"h12" | "h23" | null} the hub preference, null for en-US's 12-hour default
+ * @param hourCycle {"h12" | "h23" | null} the hub preference, null for the locale's default
+ * @param locale {string} the page's locale (default "en-US")
  * @returns {string} like "Tue, Nov 3, 03:00 PM" (or "Tue, Nov 3, 15:00" for hourCycle "h23")
  */
 export const formatTime = (
   iso: string,
   zone: string,
   hourCycle: "h12" | "h23" | null = null,
-): string => formatInstant(iso, { timeZone: zone, hourCycle }, "time");
+  locale = "en-US",
+): string => formatInstant(iso, { timeZone: zone, hourCycle, locale }, "time");
 
 /**
  * @function formatDay
  * @param iso {string} an instant
  * @param zone {string} an IANA zone
+ * @param locale {string} the page's locale (default "en-US")
  * @returns {string} like "Tue, Nov 3"
  */
-export const formatDay = (iso: string, zone: string): string =>
-  formatInstant(iso, { timeZone: zone, hourCycle: null }, "day");
+export const formatDay = (iso: string, zone: string, locale = "en-US"): string =>
+  formatInstant(iso, { timeZone: zone, hourCycle: null, locale }, "day");

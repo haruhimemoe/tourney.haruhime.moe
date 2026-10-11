@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Every word the site shows comes from `@haruhimemoe/messages` through next-intl, with no language in the URL: the shared `NEXT_LOCALE` cookie, then the browser's languages, and English for anything not translated. A language picker sits in the footer once a second language exists. English only for now. Docs, legal pages, search metadata and server error messages stay English. `bun run check:keys` checks every key against the catalogs.
 - CodeQL and a gitleaks history scan run in CI, and Dependabot keeps dependencies and pinned actions current.
 - A tabbed edition settings page (General, Socials, Contact, Registration, Modules) at `/manage/[lineage]/[edition]/settings`. The Modules tab is a placeholder for now. Lineage-level default editing stays API-only (`/api/manage/[lineage]/defaults`); there's no settings UI for it yet.
 - The Modules tab now lists every registered module as a card (name, description, a switch, and a Settings link once it's on and the module has one), reading "No modules available yet" while the registry is empty. `PUT /api/manage/[lineage]/modules` turns a module on or off for admins and the owner, refusing an unregistered id and a lineage already at 32 modules, both with 400.

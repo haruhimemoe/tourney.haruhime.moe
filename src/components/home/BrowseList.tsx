@@ -8,6 +8,7 @@
  */
 
 import { LinkCard } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 import { LocalTime } from "@/components/edition/LocalTime";
 import type { BrowseItem } from "@/services/dashboard";
 import { rankLabel, sidesLabel } from "@/utils/side-format";
@@ -25,7 +26,8 @@ export type BrowseListProps = {
  * @returns {JSX.Element} the list, or a line saying nothing is open
  */
 export function BrowseList({ items, zone, hourCycle }: BrowseListProps) {
-  if (!items.length) return <p className="text-c3">Nothing is open for registration right now.</p>;
+  const t = useTranslations("tourney.browseList");
+  if (!items.length) return <p className="text-c3">{t("nothingIsOpenFor")}</p>;
   return (
     <ul className="flex flex-col gap-3">
       {items.map(({ edition, lineage }) => (

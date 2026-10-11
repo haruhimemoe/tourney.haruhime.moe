@@ -4,13 +4,14 @@
  *       with phase and year.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { Badge, LinkCard, PageHeader } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { SEO_SITE } from "@/constants/seo";
 import { getCurrentUser } from "@/lib/auth-session";
 import { collections } from "@/lib/collections";
@@ -45,6 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * @returns {Promise<JSX.Element>} the edition list
  */
 export default async function LineagePage({ params }: Props) {
+  const t = await getTranslations("tourney.pages.lineage");
   const { lineage: slug } = await params;
   const lineage = await getLineageBySlug(slug);
   if (!lineage) notFound();
@@ -73,7 +75,7 @@ export default async function LineagePage({ params }: Props) {
           ))}
         </ul>
       ) : (
-        <p className="text-c3">No editions to show yet.</p>
+        <p className="text-c3">{t("noEditionsToShow")}</p>
       )}
     </div>
   );

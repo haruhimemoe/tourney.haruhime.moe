@@ -9,6 +9,7 @@
  */
 
 import { PageHeader } from "@haruhimemoe/ui";
+import { getTranslations } from "next-intl/server";
 import { HomeTabs } from "@/components/home/HomeTabs";
 import { HostingTab } from "@/components/home/HostingTab";
 import { PlayingTab, type SavedAvailability } from "@/components/home/PlayingTab";
@@ -27,12 +28,13 @@ export const dynamic = "force-dynamic";
  * @returns {Promise<JSX.Element>} the dashboard, or the two entry points
  */
 export default async function HomePage() {
+  const t = await getTranslations("tourney.pages.home");
   const user = await getCurrentUser();
   const hostHref = user ? "/manage/new" : hubSignInHref("/manage/new");
   if (!user)
     return (
       <div className="flex flex-col gap-6">
-        <PageHeader title="osu! tournaments, run in one place" lead="Register, play, or host." />
+        <PageHeader title={t("osuTournamentsRunIn")} lead={t("registerPlayOrHost")} />
         <SignedOutHome hostHref={hostHref} />
       </div>
     );
@@ -51,7 +53,7 @@ export default async function HomePage() {
   }
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title={`Hi, ${user.username}`} />
+      <PageHeader title={t("hi", { name: user.username })} />
       <TimeHint zone={zone} hourCycle={hourCycle} />
       {playing.length || hosting.length ? (
         <HomeTabs

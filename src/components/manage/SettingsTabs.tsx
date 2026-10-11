@@ -10,6 +10,7 @@
 
 import { LinkTabs } from "@haruhimemoe/ui";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 /** The tabs after General: their path segment and label. */
 export const SETTINGS_TABS = [
@@ -26,15 +27,16 @@ export const SETTINGS_TABS = [
  * @returns {JSX.Element} the tab links
  */
 export function SettingsTabs({ base }: { base: string }) {
+  const t = useTranslations("tourney.settingsTabs");
   const path = usePathname();
   return (
     <LinkTabs
-      label="Edition settings"
+      label={t("editionSettings")}
       items={[
-        { href: base, label: "General", current: path === base },
-        ...SETTINGS_TABS.map(([segment, label]) => ({
+        { href: base, label: t("general"), current: path === base },
+        ...SETTINGS_TABS.map(([segment]) => ({
           href: `${base}/${segment}`,
-          label,
+          label: t(`tabs.${segment}`),
           current: path === `${base}/${segment}`,
         })),
       ]}

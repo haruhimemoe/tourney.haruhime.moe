@@ -4,13 +4,14 @@
  *       and picked first (the roll). The server checks it against the edition's rules. Controlled.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
 import type { FirstTurns, PickBanEntry, Side } from "@haruhimemoe/tourney";
 import { Button, Select } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 
 /** PickBanEditor's props: the log, who went first, the pool's slots and the sides' names. */
 export type PickBanEditorProps = {
@@ -39,6 +40,7 @@ export function PickBanEditor({
   names,
   disabled,
 }: PickBanEditorProps) {
+  const t = useTranslations("tourney.pickBanEditor");
   const set = (i: number, change: Partial<PickBanEntry>) =>
     onChange(value.map((e, j) => (j === i ? { ...e, ...change } : e)));
   const sideSelect = (id: string, label: string, side: Side, onPick: (s: Side) => void) => (
@@ -56,10 +58,10 @@ export function PickBanEditor({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap gap-2">
-        {sideSelect("first-ban", "Bans first", first.ban, (ban) =>
+        {sideSelect("first-ban", t("bansFirst"), first.ban, (ban) =>
           onFirstChange({ ...first, ban }),
         )}
-        {sideSelect("first-pick", "Picks first", first.pick, (pick) =>
+        {sideSelect("first-pick", t("picksFirst"), first.pick, (pick) =>
           onFirstChange({ ...first, pick }),
         )}
       </div>
@@ -68,18 +70,18 @@ export function PickBanEditor({
         <div key={i} className="flex flex-wrap items-end gap-2">
           <Select
             id={`pb-side-${i}`}
-            label={`Step ${i + 1} by`}
+            label={t("stepIBy", { i: i + 1 })}
             value={entry.side ?? ""}
             onChange={(e) => set(i, { side: (e.target.value || null) as Side | null })}
             disabled={disabled}
           >
             <option value="a">{names.a}</option>
             <option value="b">{names.b}</option>
-            <option value="">Nobody (tiebreaker)</option>
+            <option value="">{t("nobodyTiebreaker")}</option>
           </Select>
           <Select
             id={`pb-action-${i}`}
-            label={`Step ${i + 1} action`}
+            label={t("stepIAction", { i: i + 1 })}
             value={entry.action}
             onChange={(e) => set(i, { action: e.target.value as PickBanEntry["action"] })}
             disabled={disabled}
@@ -92,7 +94,7 @@ export function PickBanEditor({
           </Select>
           <Select
             id={`pb-slot-${i}`}
-            label={`Step ${i + 1} slot`}
+            label={t("stepISlot", { i: i + 1 })}
             value={entry.slot}
             onChange={(e) => set(i, { slot: e.target.value })}
             disabled={disabled}
@@ -110,7 +112,7 @@ export function PickBanEditor({
             onClick={() => onChange(value.filter((_, j) => j !== i))}
             disabled={disabled}
           >
-            Remove
+            {t("remove")}
           </Button>
         </div>
       ))}
@@ -124,7 +126,7 @@ export function PickBanEditor({
           }
           disabled={disabled || slots.length === 0}
         >
-          Add step
+          {t("addStep")}
         </Button>
       </div>
     </div>

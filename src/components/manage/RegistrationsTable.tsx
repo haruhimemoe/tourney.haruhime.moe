@@ -5,7 +5,7 @@
  *       one review call for the selected rows with an optional note.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
@@ -13,6 +13,7 @@
 import type { RegistrationStatus } from "@haruhimemoe/tourney";
 import { Button, Notice, Table, TBody, Td, TextInput, THead, Th } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { MAX_REVIEW_BATCH } from "@/constants/registration";
 import { postJson } from "@/lib/manage-client";
@@ -28,10 +29,10 @@ export type RegistrationsTableProps = {
   questions: readonly Question[];
 };
 
-const ACTIONS: readonly { to: RegistrationStatus; label: string }[] = [
-  { to: "approved", label: "Approve" },
-  { to: "waitlisted", label: "Waitlist" },
-  { to: "rejected", label: "Reject" },
+const ACTIONS: readonly { to: RegistrationStatus }[] = [
+  { to: "approved" },
+  { to: "waitlisted" },
+  { to: "rejected" },
 ];
 
 /**
@@ -40,6 +41,7 @@ const ACTIONS: readonly { to: RegistrationStatus; label: string }[] = [
  * @returns {JSX.Element} the table and its bulk actions
  */
 export function RegistrationsTable({ lineage, edition, rows, questions }: RegistrationsTableProps) {
+  const t = useTranslations("tourney.registrationsTable");
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
   const [note, setNote] = useState("");
@@ -75,7 +77,7 @@ export function RegistrationsTable({ lineage, edition, rows, questions }: Regist
       <div className="flex flex-wrap items-end gap-2">
         <TextInput
           id="review-note"
-          label="Note"
+          label={t("note")}
           value={note}
           onChange={(e) => setNote(e.target.value)}
           maxLength={500}
@@ -88,7 +90,7 @@ export function RegistrationsTable({ lineage, edition, rows, questions }: Regist
             onClick={() => act(a.to)}
             disabled={busy || selected.length === 0 || selected.length > MAX_REVIEW_BATCH}
           >
-            {`${a.label} ${selected.length}`}
+            {t("actionCount", { action: t(`actions.${a.to}`), count: selected.length })}
           </Button>
         ))}
       </div>
@@ -97,25 +99,25 @@ export function RegistrationsTable({ lineage, edition, rows, questions }: Regist
           {error}
         </Notice>
       ) : null}
-      <Table caption="Registrations" hideCaption>
+      <Table caption={t("registrations")} hideCaption>
         <THead>
           <tr>
             <Th>
               <input
                 type="checkbox"
-                aria-label="Select all"
+                aria-label={t("selectAll")}
                 checked={allOn}
                 onChange={(e) => setSelected(e.target.checked ? rows.map((r) => r.id) : [])}
               />
             </Th>
-            <Th>Player</Th>
-            <Th>Status</Th>
-            <Th>Team</Th>
+            <Th>{t("player")}</Th>
+            <Th>{t("status")}</Th>
+            <Th>{t("team")}</Th>
             {questions.map((q) => (
               <Th key={q.id}>{q.label}</Th>
             ))}
-            <Th>Other answers</Th>
-            <Th>Note</Th>
+            <Th>{t("otherAnswers")}</Th>
+            <Th>{t("note")}</Th>
           </tr>
         </THead>
         <TBody>
@@ -126,17 +128,15 @@ export function RegistrationsTable({ lineage, edition, rows, questions }: Regist
                 <Td>
                   <input
                     type="checkbox"
-                    aria-label={`Select ${r.snapshot?.username ?? r.osuId}`}
+                    aria-label={t("selectOsuid", { osuId: r.snapshot?.username ?? r.osuId })}
                     checked={selected.includes(r.id)}
                     onChange={(e) => toggle(r.id, e.target.checked)}
                   />
                 </Td>
                 <Td>
-                  <div className="font-bold text-c1">
-                    {r.snapshot?.username ?? "Deleted account"}
-                  </div>
+                  <div className="font-bold text-c1">{r.snapshot?.username ?? t("deleted")}</div>
                   <div className="text-c3 text-xs tabular-nums">
-                    {r.osuId} · {r.snapshot?.rank ? `#${r.snapshot.rank}` : "unranked"} ·{" "}
+                    {r.osuId} · {r.snapshot?.rank ? `#${r.snapshot.rank}` : t("unranked")} ·{" "}
                     {r.snapshot?.country ?? "-"}
                   </div>
                 </Td>

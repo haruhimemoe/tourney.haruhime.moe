@@ -4,12 +4,13 @@
  *       shows without a tab list.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
 import { Tabs, tabId, tabPanelId } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 import { type ReactNode, useState } from "react";
 
 type TabId = "playing" | "hosting";
@@ -25,9 +26,10 @@ const PREFIX = "home";
  * @returns {JSX.Element} the tab list and the chosen panel
  */
 export function HomeTabs({ playing, hosting }: HomeTabsProps) {
+  const t = useTranslations("tourney.homeTabs");
   const tabs = [
-    ...(playing ? [{ id: "playing" as const, label: "Playing", content: playing }] : []),
-    ...(hosting ? [{ id: "hosting" as const, label: "Hosting", content: hosting }] : []),
+    ...(playing ? [{ id: "playing" as const, label: t("playing"), content: playing }] : []),
+    ...(hosting ? [{ id: "hosting" as const, label: t("hosting"), content: hosting }] : []),
   ];
   const [value, setValue] = useState<TabId>(tabs[0]?.id ?? "playing");
   const current = tabs.find((t) => t.id === value) ?? tabs[0];
@@ -36,7 +38,7 @@ export function HomeTabs({ playing, hosting }: HomeTabsProps) {
   return (
     <div className="flex flex-col gap-4">
       <Tabs
-        label="Your tournaments"
+        label={t("yourTournaments")}
         idPrefix={PREFIX}
         tabs={tabs.map(({ id, label }) => ({ id, label }))}
         value={current.id}

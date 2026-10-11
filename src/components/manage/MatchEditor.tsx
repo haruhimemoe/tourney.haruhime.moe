@@ -6,7 +6,7 @@
  *       Forfeit and undo sit beside it.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
@@ -15,6 +15,7 @@ import type { FirstTurns, MapResult, PickBanEntry } from "@haruhimemoe/tourney";
 import type { MatchProblem } from "@haruhimemoe/tourney/mp";
 import { Button, Notice, SectionHeading, TextInput } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { postJson } from "@/lib/manage-client";
 import { MapResultsEditor } from "./MapResultsEditor";
@@ -54,6 +55,7 @@ const digits = (text: string) => (/^\d+$/.test(text.trim()) ? Number(text) : nul
  * @returns {JSX.Element} the fill box, the result form and the match actions
  */
 export function MatchEditor({ lineage, edition, match, names, slots, pickBans }: MatchEditorProps) {
+  const t = useTranslations("tourney.matchEditor");
   const router = useRouter();
   const [mpLink, setMpLink] = useState(match.mpLinks[0] ?? "");
   const [warmups, setWarmups] = useState("0");
@@ -113,7 +115,7 @@ export function MatchEditor({ lineage, edition, match, names, slots, pickBans }:
       "PUT",
     );
     setBusy(false);
-    after(result.ok, result.ok ? "Result saved." : result.message);
+    after(result.ok, result.ok ? t("saved") : result.message);
     if (result.ok) setFill(null);
   };
 
@@ -121,24 +123,24 @@ export function MatchEditor({ lineage, edition, match, names, slots, pickBans }:
     setBusy(true);
     const result = await postJson(`${base}/forfeit`, { winner });
     setBusy(false);
-    after(result.ok, result.ok ? `${names[winner]} advance by forfeit.` : result.message);
+    after(result.ok, result.ok ? t("forfeit", { name: names[winner] }) : result.message);
   };
 
   const undo = async () => {
     setBusy(true);
     const result = await postJson(`${base}/result`, {}, "DELETE");
     setBusy(false);
-    after(result.ok, result.ok ? "Result undone." : result.message);
+    after(result.ok, result.ok ? t("undone") : result.message);
   };
 
   return (
     <div className="flex max-w-3xl flex-col gap-6">
       <section className="flex flex-col gap-3">
-        <SectionHeading>Fill from mp</SectionHeading>
+        <SectionHeading>{t("fillFromMp")}</SectionHeading>
         <div className="flex flex-wrap items-end gap-2">
           <TextInput
             id="mp-link"
-            label="mp link"
+            label={t("mpLink")}
             value={mpLink}
             onChange={(e) => setMpLink(e.target.value)}
             maxLength={200}
@@ -147,14 +149,14 @@ export function MatchEditor({ lineage, edition, match, names, slots, pickBans }:
           />
           <TextInput
             id="warmups"
-            label="Warmups"
+            label={t("warmups")}
             inputMode="numeric"
             value={warmups}
             onChange={(e) => setWarmups(e.target.value)}
             disabled={busy}
           />
           <Button type="button" variant="ghost" onClick={runFill} disabled={busy || !mpLink.trim()}>
-            Fill
+            {t("fill")}
           </Button>
         </div>
         {fill ? (
@@ -179,7 +181,7 @@ export function MatchEditor({ lineage, edition, match, names, slots, pickBans }:
         <div className="flex flex-wrap gap-2">
           <TextInput
             id="score-a"
-            label={`${names.a} maps`}
+            label={t("aMaps", { a: names.a })}
             inputMode="numeric"
             value={scoreA}
             onChange={(e) => setScoreA(e.target.value)}
@@ -187,14 +189,14 @@ export function MatchEditor({ lineage, edition, match, names, slots, pickBans }:
           />
           <TextInput
             id="score-b"
-            label={`${names.b} maps`}
+            label={t("bMaps", { b: names.b })}
             inputMode="numeric"
             value={scoreB}
             onChange={(e) => setScoreB(e.target.value)}
             disabled={busy}
           />
         </div>
-        <p className="text-c3 text-sm">With maps listed, the score is counted from them.</p>
+        <p className="text-c3 text-sm">{t("withMapsListedThe")}</p>
         <MapResultsEditor
           value={maps}
           onChange={setMaps}
@@ -205,7 +207,7 @@ export function MatchEditor({ lineage, edition, match, names, slots, pickBans }:
       </section>
       {pickBans ? (
         <section className="flex flex-col gap-3">
-          <SectionHeading>Picks and bans</SectionHeading>
+          <SectionHeading>{t("picksAndBans")}</SectionHeading>
           <PickBanEditor
             value={log}
             onChange={setLog}
@@ -220,7 +222,7 @@ export function MatchEditor({ lineage, edition, match, names, slots, pickBans }:
       <section className="flex flex-wrap gap-2">
         <TextInput
           id="stream-url"
-          label="Stream link"
+          label={t("streamLink")}
           type="url"
           value={streamUrl}
           onChange={(e) => setStreamUrl(e.target.value)}
@@ -228,7 +230,7 @@ export function MatchEditor({ lineage, edition, match, names, slots, pickBans }:
         />
         <TextInput
           id="vod-url"
-          label="VOD link"
+          label={t("vodLink")}
           type="url"
           value={vodUrl}
           onChange={(e) => setVodUrl(e.target.value)}
@@ -242,7 +244,7 @@ export function MatchEditor({ lineage, edition, match, names, slots, pickBans }:
       ) : null}
       <div className="flex flex-wrap gap-2">
         <Button type="button" onClick={save} disabled={busy || blocked}>
-          Save result
+          {t("saveResult")}
         </Button>
         <Button type="button" variant="ghost" onClick={() => forfeit("a")} disabled={busy}>
           {names.b} forfeit
@@ -251,7 +253,7 @@ export function MatchEditor({ lineage, edition, match, names, slots, pickBans }:
           {names.a} forfeit
         </Button>
         <Button type="button" variant="ghost" onClick={undo} disabled={busy}>
-          Undo result
+          {t("undoResult")}
         </Button>
       </div>
     </div>

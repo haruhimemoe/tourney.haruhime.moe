@@ -4,10 +4,11 @@
  *       review, matches without a time, results overdue. Nothing to do shows "All caught up".
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { Card, TextLink } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 import type { HostingEntry, HostTodo } from "@/services/dashboard";
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
@@ -35,6 +36,7 @@ const todoLines = (todo: HostTodo): string[] => [
  * @returns {JSX.Element} one card per lineage
  */
 export function HostingTab({ entries }: { entries: readonly HostingEntry[] }) {
+  const t = useTranslations("tourney.hostingTab");
   return (
     <div className="flex flex-col gap-4">
       {entries.map(({ lineage, editions }) => (
@@ -58,14 +60,14 @@ export function HostingTab({ entries }: { entries: readonly HostingEntry[] }) {
                         ))}
                       </ul>
                     ) : (
-                      <span className="text-c3">All caught up</span>
+                      <span className="text-c3">{t("allCaughtUp")}</span>
                     )}
                   </li>
                 );
               })}
             </ul>
           ) : (
-            <p className="text-c3 text-sm">No editions yet.</p>
+            <p className="text-c3 text-sm">{t("noEditionsYet")}</p>
           )}
         </Card>
       ))}
