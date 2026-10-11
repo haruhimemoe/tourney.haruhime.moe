@@ -7,20 +7,25 @@
  *       The viewer's zone prefers the hub's preferences.timezone (set at
  *       https://haruhime.moe/account#time), falling back to the profile's own stored
  *       `timezone` (kept until profiles stop carrying it), then null (UTC on the server,
- *       the browser's zone after mount). hourCycle is the hub's alone: null leaves the
- *       browser locale to decide, never forced to 24-hour.
+ *       the browser's zone after mount). hourCycle is the hub's alone: null renders as
+ *       formatInstant's pinned "en-US" default (12-hour, AM/PM), never the visitor's own
+ *       locale (formatInstant always formats as en-US, so this stays hydration-safe).
+ *
+ *       resolveViewerPrefs takes the session's already-read `preferences` rather than reading
+ *       them again: requirePublic and every caller here get them from getCurrentUser(), so a
+ *       second readPreferences per request would just be a redundant identity query.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
  * @modified Sun Oct 11, 2026
  */
 
 import "server-only";
-import { readPreferences } from "@haruhimemoe/next-kit/preferences/server";
+import type { Preferences } from "@haruhimemoe/next-kit/preferences";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { getCurrentUser } from "@/lib/auth-session";
 import { collections } from "@/lib/collections";
-import { connectDb, getDb, getIdentityDb } from "@/lib/db";
+import { connectDb, getDb } from "@/lib/db";
 import { type PublicPayload, publicEdition } from "@/services/public-view";
 
 /** The viewer's resolved display preferences: zone (hub, else profile, else null), hour cycle. */
@@ -40,17 +45,21 @@ export const profileTimezone = async (userId: string): Promise<string | null> =>
 };
 
 /**
- * @function viewerPrefs
+ * @function resolveViewerPrefs
  * @param userId {string | null} the signed-in account
- * @returns {Promise<ViewerPrefs>} the hub's preferences.timezone, falling back to the
- *          profile's stored zone, then null; the hub's hourCycle (null: the browser decides)
+ * @param preferences {Preferences | null} their session's preferences, already read by
+ *        getCurrentUser (null when signed out)
+ * @returns {Promise<ViewerPrefs>} preferences.timezone, falling back to the profile's stored
+ *          zone, then null; preferences.hourCycle as given (null: formatInstant's en-US
+ *          default)
  */
-export const viewerPrefs = async (userId: string | null): Promise<ViewerPrefs> => {
-  if (!userId) return { zone: null, hourCycle: null };
-  await connectDb();
-  const prefs = await readPreferences(getIdentityDb(), userId);
-  const zone = prefs.timezone ?? (await profileTimezone(userId));
-  return { zone, hourCycle: prefs.hourCycle };
+export const resolveViewerPrefs = async (
+  userId: string | null,
+  preferences: Preferences | null,
+): Promise<ViewerPrefs> => {
+  if (!userId || !preferences) return { zone: null, hourCycle: null };
+  const zone = preferences.timezone ?? (await profileTimezone(userId));
+  return { zone, hourCycle: preferences.hourCycle };
 };
 
 /**
@@ -61,9 +70,11 @@ export const viewerPrefs = async (userId: string | null): Promise<ViewerPrefs> =
  */
 export const requirePublic = cache(
   async (lineageSlug: string, editionSlug: string): Promise<PublicPage> => {
-    const viewerId = (await getCurrentUser())?.id ?? null;
+    const user = await getCurrentUser();
+    const viewerId = user?.id ?? null;
     const view = await publicEdition(lineageSlug, editionSlug, viewerId);
     if (!view || "hidden" in view) notFound();
-    return { ...view, ...(await viewerPrefs(viewerId)), viewerId };
+    const prefs = await resolveViewerPrefs(viewerId, user?.preferences ?? null);
+    return { ...view, ...prefs, viewerId };
   },
 );

@@ -1,9 +1,10 @@
 /**
  * @file tests/components/manage/ScheduleTable.test.tsx
- * @desc The schedule table shows each match's time in the viewer's zone, and "not set" for none.
+ * @desc The schedule table shows each match's time in the viewer's zone and hour cycle, and
+ *       "not set" for none.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { render, screen } from "@testing-library/react";
@@ -24,5 +25,37 @@ describe("ScheduleTable", () => {
     expect(row.textContent).toContain("Tue, Nov 3, 03:00");
     expect(screen.getByRole("row", { name: /M3/ }).textContent).toContain("Not set");
     expect(screen.getByText(/Times in Asia\/Tokyo/)).toBeTruthy();
+  });
+
+  it("renders a PM time with an h12 hour cycle preference", () => {
+    const rows = [
+      {
+        code: "M1",
+        round: "SF",
+        a: "Team 1",
+        b: "Team 4",
+        scheduledAt: "2026-11-02T15:00:00.000Z",
+      },
+    ];
+    render(
+      <ScheduleTable lineage="egc" edition="egc2026" rows={rows} zone="UTC" hourCycle="h12" />,
+    );
+    expect(screen.getByRole("row", { name: /M1/ }).textContent).toContain("03:00 PM");
+  });
+
+  it("renders 24-hour with an h23 hour cycle preference", () => {
+    const rows = [
+      {
+        code: "M1",
+        round: "SF",
+        a: "Team 1",
+        b: "Team 4",
+        scheduledAt: "2026-11-02T15:00:00.000Z",
+      },
+    ];
+    render(
+      <ScheduleTable lineage="egc" edition="egc2026" rows={rows} zone="UTC" hourCycle="h23" />,
+    );
+    expect(screen.getByRole("row", { name: /M1/ }).textContent).toContain("15:00");
   });
 });

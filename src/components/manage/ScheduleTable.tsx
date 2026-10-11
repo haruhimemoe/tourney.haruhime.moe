@@ -1,11 +1,12 @@
 /**
  * @file src/components/manage/ScheduleTable.tsx
  * @desc The edition's matches with their times shown in the viewer's zone (the `zone` prop, else
- *       the browser's). A host sets a time by hand (typed in their own time), asks for
- *       suggestions from both rosters' availability and picks one, or fills a whole round.
+ *       the browser's) and hour cycle (the `hourCycle` prop, else next-kit's en-US default: 12h
+ *       with AM/PM). A host sets a time by hand (typed in their own time), asks for suggestions
+ *       from both rosters' availability and picks one, or fills a whole round.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
@@ -15,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { postJson } from "@/lib/manage-client";
 import { fromLocalInput, toLocalInput } from "@/utils/local-time";
+import { formatTime } from "@/utils/zoned-time";
 
 /** One row: a match code, its round, both sides' names (null while unknown) and its time. */
 export type ScheduleRow = {
@@ -25,37 +27,21 @@ export type ScheduleRow = {
   scheduledAt: string | null;
 };
 
-/** ScheduleTable's props: the slugs, the rows and the zone to show times in. */
+/** ScheduleTable's props: the slugs, the rows, and the zone and hour cycle to show times in. */
 export type ScheduleTableProps = {
   lineage: string;
   edition: string;
   rows: readonly ScheduleRow[];
-  zone?: string;
+  zone?: string | null | undefined;
+  hourCycle?: "h12" | "h23" | null | undefined;
 };
-
-/**
- * @function formatIn
- * @param iso {string} an instant
- * @param zone {string} an IANA zone
- * @returns {string} like "Tue, Nov 3, 03:00"
- */
-const formatIn = (iso: string, zone: string): string =>
-  new Intl.DateTimeFormat("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-    timeZone: zone,
-  }).format(new Date(iso));
 
 /**
  * @function ScheduleTable
  * @param props {ScheduleTableProps} the matches
  * @returns {JSX.Element} the table with its scheduling actions
  */
-export function ScheduleTable({ lineage, edition, rows, zone }: ScheduleTableProps) {
+export function ScheduleTable({ lineage, edition, rows, zone, hourCycle }: ScheduleTableProps) {
   const router = useRouter();
   // The server doesn't know the viewer's zone: UTC until the browser says, so hydration matches.
   const [viewerZone, setViewerZone] = useState(zone ?? "UTC");
@@ -151,7 +137,11 @@ export function ScheduleTable({ lineage, edition, rows, zone }: ScheduleTablePro
               <Td>
                 {r.a ?? "TBD"} vs {r.b ?? "TBD"}
               </Td>
-              <Td>{r.scheduledAt ? formatIn(r.scheduledAt, viewerZone) : "Not set"}</Td>
+              <Td>
+                {r.scheduledAt
+                  ? formatTime(r.scheduledAt, viewerZone, hourCycle ?? null)
+                  : "Not set"}
+              </Td>
               <Td>
                 <div className="flex flex-wrap items-center gap-2">
                   <TextInput
@@ -191,7 +181,7 @@ export function ScheduleTable({ lineage, edition, rows, zone }: ScheduleTablePro
                       onClick={() => setTime(r.code, start)}
                       disabled={busy}
                     >
-                      {formatIn(start, viewerZone)}
+                      {formatTime(start, viewerZone, hourCycle ?? null)}
                     </Button>
                   ))}
                 </div>

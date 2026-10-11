@@ -2,8 +2,9 @@
  * @file src/components/edition/LocalTime.tsx
  * @desc An instant in the viewer's zone: the given zone (the hub's preference, falling back to
  *       the profile's), else UTC from the server, swapped to the browser's zone after mount.
- *       The hour cycle is the same fallback: the hub preference, or the browser locale's own
- *       when it's null. Always a `<time dateTime>`, so the instant reads without JavaScript too.
+ *       The hour cycle is the hub's preference alone: null isn't the browser's locale deciding,
+ *       it's formatInstant's pinned "en-US" default (12-hour, AM/PM), the same on server and
+ *       client. Always a `<time dateTime>`, so the instant reads without JavaScript too.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
  * @modified Sun Oct 11, 2026

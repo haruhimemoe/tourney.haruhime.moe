@@ -4,7 +4,7 @@
  *       each linking to its result editor.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
@@ -66,6 +66,8 @@ export default async function SchedulePage({ params }: Props) {
           b: m.b ? (names.get(m.b) ?? null) : null,
           scheduledAt: m.scheduledAt,
         }))}
+        zone={user.preferences.timezone}
+        hourCycle={user.preferences.hourCycle}
       />
     </div>
   );

@@ -2,8 +2,8 @@
  * @file src/components/edition/ScheduleList.tsx
  * @desc The public schedule: matches grouped by day in the viewer's zone (UTC until the browser
  *       says, unless the server knows it), earliest first, unscheduled matches last. Each match
- *       links to its page. Times use the viewer's hub hour cycle, or the browser locale's own
- *       when it's null.
+ *       links to its page. Times use the viewer's hub hour cycle, or formatInstant's pinned
+ *       "en-US" default (12-hour, AM/PM) when it's null, never the browser's own locale.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
  * @modified Sun Oct 11, 2026
