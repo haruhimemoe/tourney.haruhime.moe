@@ -1,15 +1,16 @@
 /**
  * @file src/schemas/lineage.ts
  * @desc A lineage: a tournament series (Evergreen Cup) with one owner, its admins and the
- *       defaults each new edition starts from. Its slug is the first URL segment, so route
- *       names are reserved.
+ *       defaults each new edition starts from (including socials, contact and hue). Its slug is
+ *       the first URL segment, so route names are reserved.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { IdSchema, InstantSchema, MODES, SideRulesSchema } from "@haruhimemoe/tourney";
 import { z } from "zod";
+import { ContactSchema, SocialsSchema } from "@/schemas/social";
 
 /** 3 to 40 of a-z, 0-9 and "-", not starting or ending with "-". */
 export const LINEAGE_SLUG = /^[a-z0-9](?:[a-z0-9-]{1,38})[a-z0-9]$/;
@@ -59,6 +60,9 @@ export const LineageSchema = z.object({
     mode: z.enum(MODES),
     sides: SideRulesSchema,
     rulesText: z.string().max(MAX_RULES_TEXT),
+    socials: SocialsSchema.default([]),
+    contact: ContactSchema.default({ email: null, discord: null }),
+    hue: z.number().int().min(0).max(359).nullable().default(null),
   }),
   createdAt: InstantSchema,
   updatedAt: InstantSchema,

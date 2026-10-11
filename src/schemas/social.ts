@@ -1,7 +1,8 @@
 /**
  * @file src/schemas/social.ts
  * @desc A social link: a kind, an https URL whose host matches that kind, and an optional label
- *       (required for "custom"). An edition shows at most MAX_SOCIALS of them.
+ *       (required for "custom"). An edition shows at most MAX_SOCIALS of them. Also Contact: how
+ *       to reach the host, shared between an edition and its lineage's defaults.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 11, 2026
  * @modified Sun Oct 11, 2026
@@ -74,3 +75,12 @@ export type Social = z.infer<typeof SocialSchema>;
 
 /** An edition's social links. */
 export const SocialsSchema = z.array(SocialSchema).max(MAX_SOCIALS);
+
+/** How to reach the host: an email and/or a Discord handle, either optional. */
+export const ContactSchema = z.object({
+  email: z.string().email().nullable(),
+  discord: z.string().max(40).nullable(),
+});
+
+/** How to reach the host. */
+export type Contact = z.infer<typeof ContactSchema>;

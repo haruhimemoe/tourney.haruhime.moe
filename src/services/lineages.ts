@@ -2,21 +2,25 @@
  * @file src/services/lineages.ts
  * @desc Lineages: create (reserved and taken slugs refused, the creator the owner), find by slug
  *       or id, each member's role, and the owner's admin list and ownership moves. A duplicate
- *       slug from a concurrent create comes back as slug-taken, never a 500.
+ *       slug from a concurrent create comes back as slug-taken, never a 500. `defaults.socials`,
+ *       `defaults.contact` and `defaults.hue` are optional on input; the schema fills them in.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import "server-only";
 import { MongoServerError, ObjectId } from "mongodb";
+import type { z } from "zod";
 import { collections, type Doc, fromId, toId } from "@/lib/collections";
 import { connectDb, getDb } from "@/lib/db";
 import { type Lineage, type LineageRole, LineageSchema, RESERVED_SLUGS } from "@/schemas/lineage";
 import { type AppResult, fail, ok } from "@/utils/result";
 
-/** What a host types to make a lineage. */
-export type LineageInput = Pick<Lineage, "slug" | "name" | "description" | "defaults">;
+/** What a host types to make a lineage; defaults' socials, contact and hue may be left out. */
+export type LineageInput = Pick<Lineage, "slug" | "name" | "description"> & {
+  defaults: z.input<typeof LineageSchema>["defaults"];
+};
 
 const lineages = async () => {
   await connectDb();

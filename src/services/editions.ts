@@ -2,11 +2,12 @@
  * @file src/services/editions.ts
  * @desc Editions: create (owner or admin of the lineage; the active edition limit is charged to
  *       the lineage owner and checked again after the insert, so two creates at once can't both
- *       get through), find by lineage and edition slug, edit (the merged edition is parsed whole),
- *       and move phases through the library's advancePhase.
+ *       get through; the lineage's socials, contact and hue defaults are copied in at creation
+ *       only, never kept in sync afterward), find by lineage and edition slug, edit (the merged
+ *       edition is parsed whole), and move phases through the library's advancePhase.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import "server-only";
@@ -90,6 +91,11 @@ export const createEdition = async (
     questions: [],
     pickBanRules: null,
     archived: false,
+    acronym: null,
+    bannerUrl: null,
+    hue: lineage.defaults.hue,
+    socials: lineage.defaults.socials,
+    contact: lineage.defaults.contact,
     createdAt: now,
     updatedAt: now,
   });

@@ -3,16 +3,24 @@
  * @desc Editions: one active edition per owner (ten for a verified host), charged to the
  *       lineage owner even when an admin creates it, exactly one of two concurrent creates
  *       through; codes that slug the same are refused; edits are parsed; phases move forward
- *       only, with the library's error.
+ *       only, with the library's error; a new edition copies the lineage's social/contact/hue
+ *       defaults, and a later change to those defaults leaves it alone.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
+import { ObjectId } from "mongodb";
 import { describe, expect, it } from "vitest";
 import { collections } from "@/lib/collections";
 import { getDb } from "@/lib/db";
-import { createEdition, getEdition, moveEditionPhase, updateEdition } from "@/services/editions";
+import {
+  createEdition,
+  getEdition,
+  getEditionById,
+  moveEditionPhase,
+  updateEdition,
+} from "@/services/editions";
 import { activeEditionCount, editionLimit } from "@/services/limits";
 import { addAdmin, createLineage } from "@/services/lineages";
 import { createTestUser } from "../../helpers/auth";
@@ -121,5 +129,40 @@ describe("editions", () => {
     if (!e.ok) throw new Error(e.error.message);
     expect((await moveEditionPhase(e.value.id, "bracket")).ok).toBe(true);
     expect(codeOf(await moveEditionPhase(e.value.id, "registration"))).toBe("bad-state");
+  });
+
+  it("copies the lineage's socials, contact and hue onto a new edition", async () => {
+    const user = await createTestUser(1);
+    const l = await createLineage(user.id, {
+      ...LINEAGE_INPUT,
+      slug: "cup-1",
+      defaults: {
+        ...LINEAGE_INPUT.defaults,
+        socials: [{ kind: "discord" as const, url: "https://discord.gg/abc", label: null }],
+        contact: { email: "host@example.com", discord: "host#0001" },
+        hue: 210,
+      },
+    });
+    if (!l.ok) throw new Error(l.error.message);
+    const e = await createEdition(user.id, l.value.id, edition);
+    if (!e.ok) throw new Error(e.error.message);
+    expect(e.value.socials).toEqual([
+      { kind: "discord", url: "https://discord.gg/abc", label: null },
+    ]);
+    expect(e.value.contact).toEqual({ email: "host@example.com", discord: "host#0001" });
+    expect(e.value.hue).toBe(210);
+  });
+
+  it("leaves an existing edition alone when the lineage's defaults change later", async () => {
+    const { user, lineage } = await ownerWithLineage();
+    const e = await createEdition(user.id, lineage.id, edition);
+    if (!e.ok) throw new Error(e.error.message);
+    expect(e.value.hue).toBeNull();
+    await collections(getDb()).lineages.updateOne(
+      { _id: new ObjectId(lineage.id) },
+      { $set: { "defaults.hue": 50 } },
+    );
+    const reread = await getEditionById(e.value.id);
+    expect(reread?.hue).toBeNull();
   });
 });

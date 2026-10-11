@@ -1,11 +1,12 @@
 /**
  * @file src/schemas/edition.ts
  * @desc An edition: one run of a lineage. The library's TournamentSchema plus where it lives
- *       (lineage, slug), dates, rules, who may register, its questions and its bracket config.
- *       BWS is out of v0, so eligibility has rank, countries and regions only.
+ *       (lineage, slug), dates, rules, who may register, its questions, its bracket config and
+ *       its settings page fields (acronym, banner, hue, socials, contact). BWS is out of v0, so
+ *       eligibility has rank, countries and regions only.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import {
@@ -18,6 +19,7 @@ import {
 import { z } from "zod";
 import { MAX_RULES_TEXT } from "@/schemas/lineage";
 import { MAX_QUESTIONS, QuestionSchema } from "@/schemas/question";
+import { ContactSchema, SocialsSchema } from "@/schemas/social";
 
 /**
  * @function editionSlug
@@ -78,6 +80,11 @@ export const EditionSchema = TournamentSchema.extend({
   questions: z.array(QuestionSchema).max(MAX_QUESTIONS),
   pickBanRules: PickBanRulesSchema.nullable(),
   archived: z.boolean().default(false),
+  acronym: z.string().max(12).nullable().default(null),
+  bannerUrl: z.string().url().max(300).nullable().default(null),
+  hue: z.number().int().min(0).max(359).nullable().default(null),
+  socials: SocialsSchema.default([]),
+  contact: ContactSchema.default({ email: null, discord: null }),
   createdAt: InstantSchema,
   updatedAt: InstantSchema,
 });

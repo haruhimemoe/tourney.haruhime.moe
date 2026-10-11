@@ -3,7 +3,7 @@
  * @desc Valid stored rows to build tests from: a lineage and a solo 1v1 edition in setup.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import type { Edition } from "@/schemas/edition";
@@ -29,6 +29,9 @@ export const makeLineage = (overrides: Partial<Lineage> = {}): Lineage => ({
     mode: "osu",
     sides: { kind: "solo", lineup: 1, rosterMin: 1, rosterMax: 1, subsMax: 0 },
     rulesText: "",
+    socials: [],
+    contact: { email: null, discord: null },
+    hue: null,
   },
   createdAt: T0,
   updatedAt: T0,
@@ -60,6 +63,11 @@ export const makeEdition = (overrides: Partial<Edition> = {}): Edition => ({
   questions: [],
   pickBanRules: null,
   archived: false,
+  acronym: null,
+  bannerUrl: null,
+  hue: null,
+  socials: [],
+  contact: { email: null, discord: null },
   createdAt: T0,
   updatedAt: T0,
   ...overrides,
