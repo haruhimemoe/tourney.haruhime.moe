@@ -43,8 +43,6 @@ export const checkRegistry = (list: readonly TourneyModule[]): void => {
 /** Every opt-in module the app knows about. Empty until a real module ships. */
 export const MODULES: readonly TourneyModule[] = Object.freeze([]);
 
-checkRegistry(MODULES);
-
 /**
  * @function findModule
  * @param id {string} a module id
