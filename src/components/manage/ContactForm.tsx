@@ -1,7 +1,8 @@
 /**
  * @file src/components/manage/ContactForm.tsx
- * @desc How to reach the host: an email and a Discord handle, either optional. Saves on its own
- *       PATCH to the settings route.
+ * @desc How to reach the host: an email and a Discord handle, either optional, shown to players
+ *       with a question on the public tournament page (StaffContact). Saves on its own PATCH to
+ *       the settings route.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 11, 2026
  * @modified Sun Oct 11, 2026
@@ -50,6 +51,7 @@ export function ContactForm({ lineage, edition, initial }: ContactFormProps) {
         id="contact-email"
         label="Email"
         type="email"
+        hint="Shown on the public tournament page."
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         disabled={busy}
@@ -57,7 +59,7 @@ export function ContactForm({ lineage, edition, initial }: ContactFormProps) {
       <TextInput
         id="contact-discord"
         label="Discord handle"
-        hint="How players reach you, not a server invite (that goes in Socials)."
+        hint="How players reach you, not a server invite (that goes in Socials). Shown on the public tournament page."
         maxLength={40}
         value={discord}
         onChange={(e) => setDiscord(e.target.value)}

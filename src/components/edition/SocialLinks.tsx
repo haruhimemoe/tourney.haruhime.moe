@@ -44,7 +44,7 @@ export function SocialLinks({ socials }: SocialLinksProps) {
             href={social.url}
             rel="noopener noreferrer"
             target="_blank"
-            className="coarse:-m-3 inline-flex items-center gap-1.5 coarse:p-3 text-c2 hover:text-c1"
+            className="wrap-anywhere coarse:-m-3 inline-flex min-w-0 items-center gap-1.5 coarse:p-3 text-c2 hover:text-c1"
           >
             {social.kind === "discord" ? <DiscordIcon /> : null}
             {social.label ?? KIND_LABELS[social.kind]}

@@ -1,13 +1,14 @@
 /**
  * @file src/app/manage/[lineage]/[edition]/settings/registration/page.tsx
- * @desc Registration settings for lineage members: window, cap, questions and eligibility.
+ * @desc Registration settings for lineage members: window, cap, questions and eligibility. The
+ *       settings section's layout already renders the header and tabs, so this page is the form
+ *       alone.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
-import { PageHeader } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { RegistrationSettingsForm } from "@/components/manage/RegistrationSettingsForm";
@@ -44,17 +45,14 @@ export default async function RegistrationSettingsPage({ params }: Props) {
   if (!found || !memberRole(found.lineage, user.id)) notFound();
   const { lineage, edition } = found;
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader title="Registration settings" lead={edition.name} />
-      <RegistrationSettingsForm
-        lineage={lineage.slug}
-        edition={edition.slug}
-        initial={{
-          registration: edition.registration,
-          questions: edition.questions,
-          eligibility: edition.eligibility,
-        }}
-      />
-    </div>
+    <RegistrationSettingsForm
+      lineage={lineage.slug}
+      edition={edition.slug}
+      initial={{
+        registration: edition.registration,
+        questions: edition.questions,
+        eligibility: edition.eligibility,
+      }}
+    />
   );
 }

@@ -1,7 +1,7 @@
 /**
  * @file src/app/[lineage]/[edition]/page.tsx
- * @desc The edition's overview: phase, dates, format, registration, the host's socials and
- *       rules.
+ * @desc The edition's overview: phase, dates, format, registration, the host's socials, contact
+ *       and rules.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
  * @modified Sun Oct 11, 2026
@@ -12,6 +12,7 @@ import { ButtonLink, SectionHeading, StatList } from "@haruhimemoe/ui";
 import { LocalTime } from "@/components/edition/LocalTime";
 import { RulesText } from "@/components/edition/RulesText";
 import { SocialLinks } from "@/components/edition/SocialLinks";
+import { StaffContact } from "@/components/edition/StaffContact";
 import { requirePublic } from "@/lib/public-page";
 import { type EditionParams, tabMetadata } from "./meta";
 
@@ -61,6 +62,7 @@ export default async function OverviewPage({ params }: EditionParams) {
         </div>
       ) : null}
       <SocialLinks socials={e.socials} />
+      <StaffContact contact={e.contact} />
       {e.rulesText.trim() ? (
         <section className="flex flex-col gap-2">
           <SectionHeading>Rules</SectionHeading>

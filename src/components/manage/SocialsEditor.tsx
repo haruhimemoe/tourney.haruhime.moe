@@ -159,6 +159,7 @@ export function SocialsEditor({ lineage, edition, initial }: SocialsEditorProps)
                 <TextInput
                   id={`social-label-${row.key}`}
                   label="Label"
+                  maxLength={40}
                   value={row.label ?? ""}
                   onChange={(e) =>
                     update(row.key, (r) => ({ ...r, label: e.target.value || null }))

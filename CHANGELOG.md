@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - CodeQL and a gitleaks history scan run in CI, and Dependabot keeps dependencies and pinned actions current.
 - A tabbed edition settings page (General, Socials, Contact, Registration, Modules) at `/manage/[lineage]/[edition]/settings`. The Modules tab is a placeholder for now. Lineage-level default editing stays API-only (`/api/manage/[lineage]/defaults`); there's no settings UI for it yet.
 - The public edition page shows the host's social links (Discord gets an icon; the rest show as text) when the edition has any.
+- The public edition page shows a "Questions? Contact staff" line with the host's Discord handle and/or a mailto link, when either is set.
 
 ### Changed
 
