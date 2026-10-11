@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - CodeQL and a gitleaks history scan run in CI, and Dependabot keeps dependencies and pinned actions current.
 - A tabbed edition settings page (General, Socials, Contact, Registration, Modules) at `/manage/[lineage]/[edition]/settings`. The Modules tab is a placeholder for now. Lineage-level default editing stays API-only (`/api/manage/[lineage]/defaults`); there's no settings UI for it yet.
+- The Modules tab now lists every registered module as a card (name, description, a switch, and a Settings link once it's on and the module has one), reading "No modules available yet" while the registry is empty. `PUT /api/manage/[lineage]/modules` turns a module on or off for admins and the owner, refusing an unregistered id and a lineage already at 32 modules, both with 400.
 - The public edition page shows the host's social links (Discord gets an icon; the rest show as text) when the edition has any.
 - The public edition page shows a "Questions? Contact staff" line with the host's Discord handle and/or a mailto link, when either is set.
 

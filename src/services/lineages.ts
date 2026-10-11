@@ -1,14 +1,16 @@
 /**
  * @file src/services/lineages.ts
  * @desc Lineages: create (reserved and taken slugs refused, the creator the owner), find by slug
- *       or id, each member's role, the owner's admin list and ownership moves, and
+ *       or id, each member's role, the owner's admin list and ownership moves,
  *       updateLineageDefaults (merges socials/contact/hue into `defaults`, every other default
- *       key, like mode and sides, untouched). A duplicate slug from a concurrent create comes
- *       back as slug-taken, never a 500. `defaults.socials`, `defaults.contact` and
+ *       key, like mode and sides, untouched), and setLineageModule (turns an opt-in module id on
+ *       or off with `$addToSet`/`$pull`, capped at 32). A duplicate slug from a concurrent create
+ *       comes back as slug-taken, never a 500. `defaults.socials`, `defaults.contact` and
  *       `defaults.hue` are optional on input; the schema fills them in. Every read runs
- *       withLineageDefaults, so a row stored before those three existed still comes back with
- *       them filled in rather than undefined. A lineage's defaults only seed a new edition at
- *       creation; changing them later never touches an edition that already exists.
+ *       withLineageDefaults, so a row stored before those three (or `modules`) existed still
+ *       comes back with them filled in rather than undefined. A lineage's defaults only seed a
+ *       new edition at creation; changing them later never touches an edition that already
+ *       exists.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
  * @modified Sun Oct 11, 2026
@@ -201,6 +203,43 @@ export const removeAdmin = async (
     lineage,
     lineage.members.filter((m) => m.userId !== userId),
   );
+};
+
+/** Max opt-in modules a lineage may turn on (matches LineageSchema.modules). */
+const MAX_LINEAGE_MODULES = 32;
+
+/**
+ * @function setLineageModule
+ * @param lineageId {string} the lineage
+ * @param moduleId {string} a module id (the caller checks it's still registered before calling)
+ * @param enabled {boolean} turn it on or off
+ * @returns {Promise<AppResult<Lineage>>} the saved lineage, not-found, or limit when enabling
+ *          would push the lineage past 32 modules; `$addToSet` and `$pull` make a repeat toggle
+ *          safe against a concurrent one on the same lineage
+ */
+export const setLineageModule = async (
+  lineageId: string,
+  moduleId: string,
+  enabled: boolean,
+): Promise<AppResult<Lineage>> => {
+  const lineage = await getLineage(lineageId);
+  if (!lineage) return fail("not-found");
+  const already = lineage.modules.includes(moduleId);
+  if (enabled && !already && lineage.modules.length >= MAX_LINEAGE_MODULES)
+    return fail(
+      "limit",
+      `This lineage already has ${MAX_LINEAGE_MODULES} modules on. Turn one off first.`,
+    );
+  await (await lineages()).updateOne(
+    { _id: new ObjectId(lineageId) },
+    {
+      ...(enabled ? { $addToSet: { modules: moduleId } } : { $pull: { modules: moduleId } }),
+      $set: { updatedAt: new Date().toISOString() },
+    },
+  );
+  const saved = await getLineage(lineageId);
+  if (!saved) return fail("not-found");
+  return ok(saved);
 };
 
 /**

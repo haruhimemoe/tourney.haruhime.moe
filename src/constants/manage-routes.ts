@@ -23,6 +23,7 @@ export const MANAGE_ROUTES: readonly ManageRoute[] = [
   { path: "/api/manage/lineages", method: "POST", need: "signedIn" },
   { path: "/api/manage/[lineage]/admins", method: "PATCH", need: "owner" },
   { path: "/api/manage/[lineage]/defaults", method: "PATCH", need: "admin" },
+  { path: "/api/manage/[lineage]/modules", method: "PUT", need: "admin" },
   { path: "/api/manage/[lineage]/editions", method: "POST", need: "admin" },
   { path: "/api/manage/[lineage]/[edition]/phase", method: "POST", need: "admin" },
   { path: "/api/manage/[lineage]/[edition]/registrations/review", method: "POST", need: "admin" },
