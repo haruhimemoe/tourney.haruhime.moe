@@ -2,8 +2,9 @@
  * @file src/components/manage/ModuleCard.tsx
  * @desc One row on the Modules tab: the module's name and description, a checkbox that PUTs the
  *       toggle to /api/manage/[lineage]/modules, and a Settings link once it's both enabled and
- *       carries a settingsHref. The switch reverts and shows the route's refusal (over the
- *       32-module cap, an id gone stale) rather than staying in a state the server didn't save.
+ *       carries a settingsHref. Not optimistic: the checkbox only flips once the route answers
+ *       200; a refusal (over the 32-module cap, an id gone stale) shows under the card and the
+ *       checkbox stays exactly where it was.
  * @author David @dvhsh (https://dvh.sh)
  * @created Sun Oct 11, 2026
  * @modified Sun Oct 11, 2026
