@@ -27,8 +27,8 @@
   "dependencies": {
     "@haruhimemoe/brand": "0.10.0",
     "@haruhimemoe/invites": "0.1.0",
-    "@haruhimemoe/messages": "/private/tmp/claude-501/-Users-david-Documents-obsidian-vault/48be55d9-fccc-4299-b087-5331dd6e4515/scratchpad/messages-1791721489188181000.tgz",
-    "@haruhimemoe/next-kit": "0.19.1",
+    "@haruhimemoe/messages": "/private/tmp/claude-501/-Users-david-Documents-obsidian-vault/48be55d9-fccc-4299-b087-5331dd6e4515/scratchpad/messages-1791722820345922000.tgz",
+    "@haruhimemoe/next-kit": "0.20.0",
     "@haruhimemoe/osu": "0.7.0",
     "@haruhimemoe/pool": "0.4.0",
     "@haruhimemoe/time": "0.1.0",

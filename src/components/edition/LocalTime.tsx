@@ -13,6 +13,7 @@
 "use client";
 
 import { formatInstant } from "@haruhimemoe/next-kit/preferences";
+import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 
 /** LocalTime's props: the instant, the viewer's zone and hour cycle when the server knows them. */
@@ -42,9 +43,10 @@ export const useViewerZone = (zone?: string | null): string => {
  */
 export function LocalTime({ at, zone, hourCycle }: LocalTimeProps) {
   const viewer = useViewerZone(zone);
+  const locale = useLocale();
   return (
     <time dateTime={at} title={at}>
-      {formatInstant(at, { timeZone: viewer, hourCycle: hourCycle ?? null })}
+      {formatInstant(at, { timeZone: viewer, hourCycle: hourCycle ?? null, locale })}
       {viewer === "UTC" ? " UTC" : ""}
     </time>
   );

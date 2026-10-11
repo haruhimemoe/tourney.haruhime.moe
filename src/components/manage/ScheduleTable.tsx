@@ -13,7 +13,7 @@
 
 import { Button, Notice, Table, TBody, Td, TextInput, TextLink, THead, Th } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { postJson } from "@/lib/manage-client";
 import { fromLocalInput, toLocalInput } from "@/utils/local-time";
@@ -45,6 +45,7 @@ export type ScheduleTableProps = {
 export function ScheduleTable({ lineage, edition, rows, zone, hourCycle }: ScheduleTableProps) {
   const t = useTranslations("tourney.scheduleTable");
   const tc = useTranslations("tourney.common");
+  const locale = useLocale();
   const router = useRouter();
   // The server doesn't know the viewer's zone: UTC until the browser says, so hydration matches.
   const [viewerZone, setViewerZone] = useState(zone ?? "UTC");
@@ -145,7 +146,7 @@ export function ScheduleTable({ lineage, edition, rows, zone, hourCycle }: Sched
               <Td>{tc("versus", { a: r.a ?? tc("tbd"), b: r.b ?? tc("tbd") })}</Td>
               <Td>
                 {r.scheduledAt
-                  ? formatTime(r.scheduledAt, viewerZone, hourCycle ?? null)
+                  ? formatTime(r.scheduledAt, viewerZone, hourCycle ?? null, locale)
                   : tc("notSet")}
               </Td>
               <Td>
@@ -187,7 +188,7 @@ export function ScheduleTable({ lineage, edition, rows, zone, hourCycle }: Sched
                       onClick={() => setTime(r.code, start)}
                       disabled={busy}
                     >
-                      {formatTime(start, viewerZone, hourCycle ?? null)}
+                      {formatTime(start, viewerZone, hourCycle ?? null, locale)}
                     </Button>
                   ))}
                 </div>
