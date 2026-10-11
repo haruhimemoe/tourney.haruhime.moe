@@ -4,7 +4,7 @@
  *       or osu! id, 50 a page, with bulk approve, waitlist and reject.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
@@ -12,6 +12,7 @@ import { REGISTRATION_STATUSES, type RegistrationStatus } from "@haruhimemoe/tou
 import { Button, PageHeader, Select, TextInput, TextLink } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { RegistrationsTable } from "@/components/manage/RegistrationsTable";
 import { REGISTRATIONS_PAGE_SIZE } from "@/constants/registration";
 import { SEO_SITE } from "@/constants/seo";
@@ -45,6 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * @returns {Promise<JSX.Element>} the review table
  */
 export default async function RegistrationsPage({ params, searchParams }: Props) {
+  const t = await getTranslations("tourney.pages.manageLineageEditionRegistrations");
   const { lineage: lineageSlug, edition: editionSlug } = await params;
   const base = `/manage/${lineageSlug}/${editionSlug}/registrations`;
   const user = await requireUser(base);
@@ -69,19 +71,23 @@ export default async function RegistrationsPage({ params, searchParams }: Props)
   };
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Registrations" lead={edition.name} meta={`${total} found`} />
+      <PageHeader
+        title={t("registrations")}
+        lead={edition.name}
+        meta={t("totalFound", { total })}
+      />
       <form method="get" className="flex flex-wrap items-end gap-2">
-        <Select id="status" name="status" label="Status" defaultValue={status ?? ""}>
-          <option value="">Any</option>
+        <Select id="status" name="status" label={t("status")} defaultValue={status ?? ""}>
+          <option value="">{t("any")}</option>
           {REGISTRATION_STATUSES.map((s) => (
             <option key={s} value={s}>
               {s}
             </option>
           ))}
         </Select>
-        <TextInput id="q" name="q" label="Search" defaultValue={q} maxLength={64} />
+        <TextInput id="q" name="q" label={t("search")} defaultValue={q} maxLength={64} />
         <Button type="submit" variant="ghost">
-          Filter
+          {t("filter")}
         </Button>
       </form>
       <RegistrationsTable
@@ -90,12 +96,12 @@ export default async function RegistrationsPage({ params, searchParams }: Props)
         rows={rows}
         questions={edition.questions}
       />
-      <nav aria-label="Pages" className="flex gap-4 text-sm">
-        {page > 1 ? <TextLink href={link(page - 1)}>Previous</TextLink> : null}
+      <nav aria-label={t("pages")} className="flex gap-4 text-sm">
+        {page > 1 ? <TextLink href={link(page - 1)}>{t("previous")}</TextLink> : null}
         <span className="text-c3">
           Page {page} of {pages}
         </span>
-        {page < pages ? <TextLink href={link(page + 1)}>Next</TextLink> : null}
+        {page < pages ? <TextLink href={link(page + 1)}>{t("next")}</TextLink> : null}
       </nav>
     </div>
   );

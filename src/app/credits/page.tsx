@@ -3,12 +3,13 @@
  * @desc /credits: who tourney is built on: the haruhime libraries and the osu! API.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { PageHeader, Prose } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
+import { useTranslations } from "next-intl";
 import { PAGE_SEO, SEO_SITE } from "@/constants/seo";
 import { SITE } from "@/constants/site";
 
@@ -25,20 +26,18 @@ const PACKAGES = ["tourney", "pool", "osu", "time", "ui", "brand"] as const;
  * @returns {JSX.Element} who the code and data come from
  */
 export default function CreditsPage() {
+  const t = useTranslations("tourney.pages.credits");
   return (
     <article>
-      <PageHeader
-        title="Credits"
-        lead="tourney is built on other people's work. This is where everything comes from."
-      />
+      <PageHeader title={t("credits")} lead={t("tourneyIsBuiltOn")} />
       <Prose className="mt-6">
-        <h2>Player and match data</h2>
+        <h2>{t("playerAndMatchData")}</h2>
         <p>
           Player ranks, countries and multiplayer match results come from the{" "}
           <a href="https://osu.ppy.sh/docs">osu! API</a>, by ppy. Mappools come from{" "}
           <a href="https://pools.haruhime.moe">pools.haruhime.moe</a>.
         </p>
-        <h2>Built with</h2>
+        <h2>{t("builtWith")}</h2>
         <ul>
           {PACKAGES.map((name) => (
             <li key={name}>

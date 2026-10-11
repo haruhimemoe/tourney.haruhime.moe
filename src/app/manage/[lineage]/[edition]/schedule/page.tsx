@@ -11,6 +11,7 @@ import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { PageHeader } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ScheduleTable } from "@/components/manage/ScheduleTable";
 import { SEO_SITE } from "@/constants/seo";
 import { requireUser } from "@/lib/auth-session";
@@ -42,6 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * @returns {Promise<JSX.Element>} the schedule table
  */
 export default async function SchedulePage({ params }: Props) {
+  const t = await getTranslations("tourney.pages.manageLineageEditionSchedule");
   const { lineage: lineageSlug, edition: editionSlug } = await params;
   const user = await requireUser(`/manage/${lineageSlug}/${editionSlug}/schedule`);
   const found = await getEdition(lineageSlug, editionSlug);
@@ -55,7 +57,7 @@ export default async function SchedulePage({ params }: Props) {
     .toArray();
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Schedule" lead={edition.name} />
+      <PageHeader title={t("schedule")} lead={edition.name} />
       <ScheduleTable
         lineage={lineage.slug}
         edition={edition.slug}

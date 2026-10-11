@@ -4,12 +4,13 @@
  *       editions instead of 1.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { PageHeader } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { HostsTable } from "@/components/admin/HostsTable";
 import { SEO_SITE } from "@/constants/seo";
 import { requireAdmin } from "@/lib/auth-session";
@@ -28,12 +29,16 @@ export const metadata: Metadata = pageMetadata(SEO_SITE, {
  * @returns {Promise<JSX.Element>} the verified hosts list
  */
 export default async function AdminHostsPage() {
+  const t = await getTranslations("tourney.pages.adminHosts");
   await requireAdmin("/admin/hosts");
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Verified hosts"
-        lead={`A verified host may run ${VERIFIED_EDITION_LIMIT} active editions at once; anyone else ${DEFAULT_EDITION_LIMIT}.`}
+        title={t("verifiedHosts")}
+        lead={t("aVerifiedHostMay", {
+          LIMIT: VERIFIED_EDITION_LIMIT,
+          LIMIT2: DEFAULT_EDITION_LIMIT,
+        })}
       />
       <HostsTable hosts={await listVerifiedHosts()} />
     </div>

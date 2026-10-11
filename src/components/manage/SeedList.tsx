@@ -5,13 +5,14 @@
  *       can settle them by hand.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
 import { Button, Notice, Table, TBody, Td, TextInput, THead, Th } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { postJson } from "@/lib/manage-client";
 
@@ -30,6 +31,7 @@ export type SeedListProps = {
  * @returns {JSX.Element} the seeding actions and the seed table
  */
 export function SeedList({ lineage, edition, teams, qualifiers, randomSeed }: SeedListProps) {
+  const tx = useTranslations("tourney.seedList");
   const router = useRouter();
   const [seeds, setSeeds] = useState<Record<string, string>>(() =>
     Object.fromEntries(teams.map((t) => [t.id, t.seed?.toString() ?? ""])),
@@ -55,7 +57,7 @@ export function SeedList({ lineage, edition, teams, qualifiers, randomSeed }: Se
       );
     }
     setTied(rows.filter((r) => r.tied).map((r) => r.entrantId ?? ""));
-    setNotice({ tone: "info", text: "Seeds saved." });
+    setNotice({ tone: "info", text: tx("seedsSaved") });
     router.refresh();
   };
 
@@ -70,13 +72,13 @@ export function SeedList({ lineage, edition, teams, qualifiers, randomSeed }: Se
       <div className="flex flex-wrap items-end gap-2">
         {qualifiers ? (
           <Button type="button" onClick={() => send({ method: "qualifiers" })} disabled={busy}>
-            Seed from qualifiers
+            {tx("seedFromQualifiers")}
           </Button>
         ) : null}
         <TextInput
           id="random-seed"
-          label="Seed number"
-          hint="The same number always gives the same order."
+          label={tx("seedNumber")}
+          hint={tx("theSameNumberAlways")}
           inputMode="numeric"
           value={number}
           onChange={(e) => setNumber(e.target.value)}
@@ -88,7 +90,7 @@ export function SeedList({ lineage, edition, teams, qualifiers, randomSeed }: Se
           onClick={() => send({ method: "random", seed: Number(number) })}
           disabled={busy || !/^\d+$/.test(number)}
         >
-          Seed at random
+          {tx("seedAtRandom")}
         </Button>
       </div>
       {notice ? (
@@ -96,16 +98,12 @@ export function SeedList({ lineage, edition, teams, qualifiers, randomSeed }: Se
           {notice.text}
         </Notice>
       ) : null}
-      {tied.length > 0 ? (
-        <Notice tone="error">
-          Some teams tied. Marked below: settle them by hand if you need to.
-        </Notice>
-      ) : null}
-      <Table caption="Seeds" hideCaption>
+      {tied.length > 0 ? <Notice tone="error">{tx("someTeamsTiedMarked")}</Notice> : null}
+      <Table caption={tx("seeds")} hideCaption>
         <THead>
           <tr>
-            <Th>Seed</Th>
-            <Th>Team</Th>
+            <Th>{tx("seed")}</Th>
+            <Th>{tx("team")}</Th>
           </tr>
         </THead>
         <TBody>
@@ -114,7 +112,7 @@ export function SeedList({ lineage, edition, teams, qualifiers, randomSeed }: Se
               <Td>
                 <TextInput
                   id={`seed-${t.id}`}
-                  label={`Seed of ${t.name}`}
+                  label={tx("seedOfName", { name: t.name })}
                   hideLabel
                   inputMode="numeric"
                   value={seeds[t.id] ?? ""}
@@ -132,7 +130,7 @@ export function SeedList({ lineage, edition, teams, qualifiers, randomSeed }: Se
       </Table>
       <div>
         <Button type="button" variant="ghost" onClick={manual} disabled={busy}>
-          Save seeds as typed
+          {tx("saveSeedsAsTyped")}
         </Button>
       </div>
     </div>

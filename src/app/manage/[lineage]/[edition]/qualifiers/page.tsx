@@ -5,13 +5,14 @@
  *       stand in and a notice says why.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { Notice, PageHeader, SectionHeading } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { GenerateBracketButton } from "@/components/manage/GenerateBracketButton";
 import { QualifierScores } from "@/components/manage/QualifierScores";
 import { SeedList } from "@/components/manage/SeedList";
@@ -47,6 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * @returns {Promise<JSX.Element>} the score sheet and the seeds
  */
 export default async function QualifiersPage({ params }: Props) {
+  const t = await getTranslations("tourney.pages.manageLineageEditionQualifiers");
   const { lineage: lineageSlug, edition: editionSlug } = await params;
   const user = await requireUser(`/manage/${lineageSlug}/${editionSlug}/qualifiers`);
   const found = await getEdition(lineageSlug, editionSlug);
@@ -62,12 +64,12 @@ export default async function QualifiersPage({ params }: Props) {
       : [...new Set(saved.map((s) => s.slotKey))].sort().map((k) => ({ slotKey: k, label: k }));
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title="Qualifiers and seeds" lead={edition.name} />
+      <PageHeader title={t("qualifiersAndSeeds")} lead={edition.name} />
       {edition.qualifiers.enabled && round ? (
         <section className="flex flex-col gap-4">
-          <SectionHeading>Qualifier scores</SectionHeading>
+          <SectionHeading>{t("qualifierScores")}</SectionHeading>
           {!round.poolId ? (
-            <Notice tone="info">Link the qualifier pool on the rounds page to get its maps.</Notice>
+            <Notice tone="info">{t("linkTheQualifierPool")}</Notice>
           ) : pool && !pool.ok ? (
             <Notice tone="error">{pool.error.message}</Notice>
           ) : null}
@@ -81,7 +83,7 @@ export default async function QualifiersPage({ params }: Props) {
         </section>
       ) : null}
       <section className="flex flex-col gap-4">
-        <SectionHeading>Seeds</SectionHeading>
+        <SectionHeading>{t("seeds")}</SectionHeading>
         <SeedList
           lineage={lineage.slug}
           edition={edition.slug}
@@ -91,7 +93,7 @@ export default async function QualifiersPage({ params }: Props) {
         />
       </section>
       <section className="flex flex-col gap-4">
-        <SectionHeading>Bracket</SectionHeading>
+        <SectionHeading>{t("bracket")}</SectionHeading>
         <GenerateBracketButton
           lineage={lineage.slug}
           edition={edition.slug}

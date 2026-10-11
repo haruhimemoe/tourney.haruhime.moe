@@ -4,12 +4,13 @@
  *       are picked in `zone` (the zone they last saved in), else the browser's zone.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
 import { Button, Notice } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useViewerZone } from "@/components/edition/LocalTime";
 import { postJson } from "@/lib/manage-client";
@@ -28,6 +29,7 @@ export type AvailabilityEditorProps = {
  * @returns {JSX.Element} the grid, its zone and a save button
  */
 export function AvailabilityEditor({ editionId, zone, initial }: AvailabilityEditorProps) {
+  const t = useTranslations("tourney.availabilityEditor");
   const viewer = useViewerZone(zone);
   const [slots, setSlots] = useState<number[]>([...initial]);
   const [busy, setBusy] = useState(false);
@@ -39,7 +41,7 @@ export function AvailabilityEditor({ editionId, zone, initial }: AvailabilityEdi
     setBusy(false);
     setNotice(
       result.ok
-        ? { tone: "info", text: "Availability saved." }
+        ? { tone: "info", text: t("availabilitySaved") }
         : { tone: "error", text: result.message },
     );
   };
@@ -55,7 +57,7 @@ export function AvailabilityEditor({ editionId, zone, initial }: AvailabilityEdi
       ) : null}
       <div>
         <Button type="button" onClick={save} disabled={busy}>
-          Save availability
+          {t("saveAvailability")}
         </Button>
       </div>
     </div>

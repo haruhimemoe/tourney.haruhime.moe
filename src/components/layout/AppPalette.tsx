@@ -7,15 +7,17 @@
  *       store, then goes home.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
+import { uiLabels } from "@haruhimemoe/next-kit/i18n";
 import type { Command } from "@haruhimemoe/ui";
 import { CommandPalette, siteCommands } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { NAV_LINKS, SITE } from "@/constants/site";
+import { navLinks, SITE } from "@/constants/site";
 import { accountStore, signOutHere, useAccount } from "@/lib/account";
 
 /**
@@ -23,6 +25,9 @@ import { accountStore, signOutHere, useAccount } from "@/lib/account";
  * @returns {JSX.Element} the mounted CommandPalette, empty until opened
  */
 export function AppPalette() {
+  const t = useTranslations("tourney");
+  const tUi = useTranslations("ui");
+  const ui = useMemo(() => uiLabels(tUi), [tUi]);
   const account = useAccount();
   const signedIn = account.status === "signed-in";
 
@@ -30,22 +35,22 @@ export function AppPalette() {
     () => [
       {
         id: "tourney.new",
-        title: "Host a tournament",
-        subtitle: "Make a lineage and its first edition",
+        title: t("palette.host"),
+        subtitle: t("palette.hostSub"),
         group: "tourney",
         run: (ctx) => ctx.navigate("/manage/new"),
       },
       {
         id: "tourney.browse",
-        title: "Browse tournaments",
-        subtitle: "Open registrations and running editions",
+        title: t("palette.browse"),
+        subtitle: t("palette.browseSub"),
         group: "tourney",
         run: (ctx) => ctx.navigate("/browse"),
       },
       {
         id: "tourney.sign-out",
-        title: "Sign out",
-        group: "Account",
+        title: ui.account.signOut,
+        group: ui.siteCommands.account,
         when: () => signedIn,
         run: async (ctx) => {
           await signOutHere();
@@ -54,13 +59,22 @@ export function AppPalette() {
         },
       },
       ...siteCommands({
-        pages: NAV_LINKS,
+        pages: navLinks(t),
         repo: SITE.repoUrl,
         account: { signedIn, signInHref: "/signin", accountHref: "/account" },
+        labels: ui.siteCommands,
       }),
     ],
-    [signedIn],
+    [signedIn, t, ui],
   );
 
-  return <CommandPalette storageKey="tourney" commands={commands} />;
+  return (
+    <CommandPalette
+      storageKey="tourney"
+      commands={commands}
+      labels={ui.palette}
+      placeholder={ui.paletteProps.placeholder}
+      label={ui.paletteProps.label}
+    />
+  );
 }

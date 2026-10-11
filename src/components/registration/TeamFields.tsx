@@ -4,12 +4,13 @@
  *       listed, and the host's approval is the check.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
 import { TextInput } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 
 /** What the captain typed. Members stay text until submit. */
 export type TeamDraft = { name: string; tag: string; members: string };
@@ -42,11 +43,12 @@ export const parseMembers = (text: string): number[] => [
  * @returns {JSX.Element} the team inputs
  */
 export function TeamFields({ value, onChange, disabled }: TeamFieldsProps) {
+  const t = useTranslations("tourney.teamFields");
   return (
     <div className="flex flex-col gap-4">
       <TextInput
         id="team-name"
-        label="Team name"
+        label={t("teamName")}
         value={value.name}
         onChange={(e) => onChange({ ...value, name: e.target.value })}
         maxLength={32}
@@ -55,8 +57,8 @@ export function TeamFields({ value, onChange, disabled }: TeamFieldsProps) {
       />
       <TextInput
         id="team-tag"
-        label="Tag"
-        hint="Optional, up to 8 characters."
+        label={t("tag")}
+        hint={t("optionalUpTo8")}
         value={value.tag}
         onChange={(e) => onChange({ ...value, tag: e.target.value })}
         maxLength={8}
@@ -64,8 +66,8 @@ export function TeamFields({ value, onChange, disabled }: TeamFieldsProps) {
       />
       <TextInput
         id="team-members"
-        label="Teammates (osu! ids)"
-        hint="Separate ids with commas. You're the captain and don't need to list yourself."
+        label={t("teammatesOsuIds")}
+        hint={t("separateIdsWithCommas")}
         value={value.members}
         onChange={(e) => onChange({ ...value, members: e.target.value })}
         disabled={disabled}

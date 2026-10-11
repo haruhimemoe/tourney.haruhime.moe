@@ -4,13 +4,14 @@
  *       the caps, the questions and eligibility.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
 import { Button, Notice, SectionHeading, TextInput } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { type FormEvent, useState } from "react";
 import { postJson } from "@/lib/manage-client";
 import type { Edition } from "@/schemas/edition";
@@ -38,6 +39,7 @@ export function RegistrationSettingsForm({
   edition,
   initial,
 }: RegistrationSettingsFormProps) {
+  const t = useTranslations("tourney.registrationSettingsForm");
   const router = useRouter();
   const [opensAt, setOpensAt] = useState(toLocalInput(initial.registration.opensAt));
   const [closesAt, setClosesAt] = useState(toLocalInput(initial.registration.closesAt));
@@ -66,27 +68,27 @@ export function RegistrationSettingsForm({
     );
     setBusy(false);
     if (!result.ok) return setNotice({ tone: "error", text: result.message });
-    setNotice({ tone: "info", text: "Saved." });
+    setNotice({ tone: "info", text: t("saved") });
     router.refresh();
   };
 
   return (
     <form onSubmit={save} className="flex max-w-2xl flex-col gap-6">
       <section className="flex flex-col gap-4">
-        <SectionHeading>Window and cap</SectionHeading>
+        <SectionHeading>{t("windowAndCap")}</SectionHeading>
         <div className="flex flex-wrap gap-3">
           <TextInput
             id="opens-at"
-            label="Opens"
+            label={t("opens")}
             type="datetime-local"
-            hint="In your time zone."
+            hint={t("inYourTimeZone")}
             value={opensAt}
             onChange={(e) => setOpensAt(e.target.value)}
             disabled={busy}
           />
           <TextInput
             id="closes-at"
-            label="Closes"
+            label={t("closes")}
             type="datetime-local"
             value={closesAt}
             onChange={(e) => setClosesAt(e.target.value)}
@@ -94,8 +96,8 @@ export function RegistrationSettingsForm({
           />
           <TextInput
             id="player-cap"
-            label="Player cap"
-            hint="Past it, players join the waitlist. Empty for no cap."
+            label={t("playerCap")}
+            hint={t("pastItPlayersJoin")}
             inputMode="numeric"
             value={playerCap}
             onChange={(e) => setPlayerCap(e.target.value)}
@@ -104,11 +106,11 @@ export function RegistrationSettingsForm({
         </div>
       </section>
       <section className="flex flex-col gap-4">
-        <SectionHeading>Questions</SectionHeading>
+        <SectionHeading>{t("questions")}</SectionHeading>
         <QuestionBuilder value={questions} onChange={setQuestions} disabled={busy} />
       </section>
       <section className="flex flex-col gap-4">
-        <SectionHeading>Eligibility</SectionHeading>
+        <SectionHeading>{t("eligibility")}</SectionHeading>
         <EligibilityForm value={eligibility} onChange={setEligibility} disabled={busy} />
       </section>
       {notice ? (
@@ -118,7 +120,7 @@ export function RegistrationSettingsForm({
       ) : null}
       <div>
         <Button type="submit" disabled={busy}>
-          Save settings
+          {t("saveSettings")}
         </Button>
       </div>
     </form>

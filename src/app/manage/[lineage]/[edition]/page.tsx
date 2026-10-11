@@ -11,6 +11,7 @@ import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { PageHeader, TextLink } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { TimeHint } from "@/components/layout/TimeHint";
 import { PhaseButton } from "@/components/manage/PhaseButton";
 import { SetupChecklist } from "@/components/manage/SetupChecklist";
@@ -44,6 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * @returns {Promise<JSX.Element>} the edition's manage home
  */
 export default async function ManageEditionPage({ params }: Props) {
+  const t = await getTranslations("tourney.pages.manageLineageEdition");
   const { lineage: lineageSlug, edition: editionSlug } = await params;
   const user = await requireUser(`/manage/${lineageSlug}/${editionSlug}`);
   const found = await getEdition(lineageSlug, editionSlug);
@@ -55,24 +57,28 @@ export default async function ManageEditionPage({ params }: Props) {
       <PageHeader
         title={edition.name}
         lead={lineage.name}
-        meta={`Phase: ${PHASE_LABELS[edition.phase]}`}
+        meta={t("phasePhase", { phase: PHASE_LABELS[edition.phase] })}
         actions={
           next ? <PhaseButton lineage={lineage.slug} edition={edition.slug} to={next} /> : null
         }
       />
       <TimeHint zone={user.preferences.timezone} hourCycle={user.preferences.hourCycle} />
-      <nav aria-label="Edition pages" className="flex gap-4 text-sm">
+      <nav aria-label={t("editionPages")} className="flex gap-4 text-sm">
         <TextLink href={`/manage/${lineage.slug}/${edition.slug}/registrations`}>
-          Registrations
+          {t("registrations")}
         </TextLink>
-        <TextLink href={`/manage/${lineage.slug}/${edition.slug}/settings`}>Settings</TextLink>
+        <TextLink href={`/manage/${lineage.slug}/${edition.slug}/settings`}>
+          {t("settings")}
+        </TextLink>
         <TextLink href={`/manage/${lineage.slug}/${edition.slug}/rounds`}>
-          Bracket and rounds
+          {t("bracketAndRounds")}
         </TextLink>
         <TextLink href={`/manage/${lineage.slug}/${edition.slug}/qualifiers`}>
-          Qualifiers and seeds
+          {t("qualifiersAndSeeds")}
         </TextLink>
-        <TextLink href={`/manage/${lineage.slug}/${edition.slug}/schedule`}>Schedule</TextLink>
+        <TextLink href={`/manage/${lineage.slug}/${edition.slug}/schedule`}>
+          {t("schedule")}
+        </TextLink>
       </nav>
       <SetupChecklist items={setupChecklist(edition, await listRounds(edition.id))} />
     </div>

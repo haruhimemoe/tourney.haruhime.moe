@@ -12,6 +12,7 @@
 "use client";
 
 import { SectionHeading, TextLink } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 import { formatDay, formatTime } from "@/utils/zoned-time";
 import { useViewerZone } from "./LocalTime";
 
@@ -35,14 +36,13 @@ export type ScheduleListProps = {
   hourCycle?: "h12" | "h23" | null | undefined;
 };
 
-const UNSCHEDULED = "Not scheduled yet";
-
 /**
  * @function ScheduleList
  * @param props {ScheduleListProps} the rows
  * @returns {JSX.Element} one section per day
  */
 export function ScheduleList({ rows, base, zone, hourCycle }: ScheduleListProps) {
+  const t = useTranslations("tourney.scheduleList");
   const viewer = useViewerZone(zone);
   const sorted = [...rows].sort(
     (x, y) =>
@@ -52,10 +52,10 @@ export function ScheduleList({ rows, base, zone, hourCycle }: ScheduleListProps)
   );
   const days = new Map<string, ScheduleListRow[]>();
   for (const row of sorted) {
-    const day = row.scheduledAt ? formatDay(row.scheduledAt, viewer) : UNSCHEDULED;
+    const day = row.scheduledAt ? formatDay(row.scheduledAt, viewer) : t("unscheduled");
     days.set(day, [...(days.get(day) ?? []), row]);
   }
-  if (!rows.length) return <p className="text-c3">No matches yet.</p>;
+  if (!rows.length) return <p className="text-c3">{t("noMatchesYet")}</p>;
   return (
     <div className="flex flex-col gap-6">
       <p className="text-c3 text-sm">Times in {viewer}.</p>

@@ -6,7 +6,7 @@
  *       a refusal shows its message.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
@@ -14,6 +14,7 @@
 import type { MODES } from "@haruhimemoe/tourney";
 import { Button, Notice, SegmentedControl, Select, TextInput } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { type FormEvent, useState } from "react";
 import { MODE_LABELS, SIDE_PRESETS } from "@/constants/manage";
 import { postJson } from "@/lib/manage-client";
@@ -35,6 +36,7 @@ type Mode = (typeof MODES)[number];
  * @returns {JSX.Element} the form
  */
 export function CreateEditionForm({ lineages, year: thisYear }: CreateEditionFormProps) {
+  const t = useTranslations("tourney.createEditionForm");
   const router = useRouter();
   const [lineage, setLineage] = useState(lineages[0]?.slug ?? NEW);
   const [seriesName, setSeriesName] = useState("");
@@ -80,7 +82,7 @@ export function CreateEditionForm({ lineages, year: thisYear }: CreateEditionFor
     <form onSubmit={submit} className="flex max-w-xl flex-col gap-4">
       <Select
         id="lineage"
-        label="Series"
+        label={t("series")}
         value={lineage}
         onChange={(e) => setLineage(e.target.value)}
       >
@@ -89,13 +91,13 @@ export function CreateEditionForm({ lineages, year: thisYear }: CreateEditionFor
             {l.name}
           </option>
         ))}
-        <option value={NEW}>A new series</option>
+        <option value={NEW}>{t("aNewSeries")}</option>
       </Select>
       {lineage === NEW ? (
         <>
           <TextInput
             id="series-name"
-            label="Series name"
+            label={t("seriesName")}
             value={seriesName}
             onChange={(e) => setSeriesName(e.target.value)}
             required
@@ -103,8 +105,8 @@ export function CreateEditionForm({ lineages, year: thisYear }: CreateEditionFor
           />
           <TextInput
             id="series-slug"
-            label="Series address"
-            hint="3 to 40 lowercase letters, numbers and dashes."
+            label={t("seriesAddress")}
+            hint={t("n3To40Lowercase")}
             value={seriesSlug}
             onChange={(e) => setSeriesSlug(e.target.value.toLowerCase())}
             required
@@ -114,7 +116,7 @@ export function CreateEditionForm({ lineages, year: thisYear }: CreateEditionFor
       ) : null}
       <TextInput
         id="edition-name"
-        label="Edition name"
+        label={t("editionName")}
         value={name}
         onChange={(e) => setName(e.target.value)}
         required
@@ -122,7 +124,7 @@ export function CreateEditionForm({ lineages, year: thisYear }: CreateEditionFor
       />
       <TextInput
         id="edition-code"
-        label="Code"
+        label={t("code")}
         hint={
           <span className="font-mono">{`/${target || "series"}/${editionSlug(code) || "code"}`}</span>
         }
@@ -131,7 +133,12 @@ export function CreateEditionForm({ lineages, year: thisYear }: CreateEditionFor
         required
         maxLength={16}
       />
-      <Select id="mode" label="Mode" value={mode} onChange={(e) => setMode(e.target.value as Mode)}>
+      <Select
+        id="mode"
+        label={t("mode")}
+        value={mode}
+        onChange={(e) => setMode(e.target.value as Mode)}
+      >
         {Object.entries(MODE_LABELS).map(([value, label]) => (
           <option key={value} value={value}>
             {label}
@@ -139,14 +146,14 @@ export function CreateEditionForm({ lineages, year: thisYear }: CreateEditionFor
         ))}
       </Select>
       <SegmentedControl
-        label="Team size"
+        label={t("teamSize")}
         options={SIDE_PRESETS}
         value={preset}
         onChange={setPreset}
       />
       <TextInput
         id="year"
-        label="Year"
+        label={t("year")}
         type="number"
         min={2007}
         max={2100}
@@ -156,7 +163,7 @@ export function CreateEditionForm({ lineages, year: thisYear }: CreateEditionFor
       />
       {error ? <Notice tone="error">{error}</Notice> : null}
       <Button type="submit" disabled={busy}>
-        Create edition
+        {t("createEdition")}
       </Button>
     </form>
   );

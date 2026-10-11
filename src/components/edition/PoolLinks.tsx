@@ -4,10 +4,11 @@
  *       rounds say so; their pool id never reaches this page (public-view leaves it out).
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { TextLink } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 
 /** PoolLinks' props: pools' origin and the rounds (poolId null until revealed). */
 export type PoolLinksProps = {
@@ -21,7 +22,8 @@ export type PoolLinksProps = {
  * @returns {JSX.Element} one line per round
  */
 export function PoolLinks({ poolsUrl, rounds }: PoolLinksProps) {
-  if (!rounds.length) return <p className="text-c3">No rounds yet.</p>;
+  const t = useTranslations("tourney.poolLinks");
+  if (!rounds.length) return <p className="text-c3">{t("noRoundsYet")}</p>;
   return (
     <ul className="flex flex-col gap-2">
       {rounds.map((r) => (
@@ -31,7 +33,7 @@ export function PoolLinks({ poolsUrl, rounds }: PoolLinksProps) {
           ) : (
             <>
               <span>{r.name}</span>
-              <span className="text-c3">Not revealed yet</span>
+              <span className="text-c3">{t("notRevealedYet")}</span>
             </>
           )}
         </li>

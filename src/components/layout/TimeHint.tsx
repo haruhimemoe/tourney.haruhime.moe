@@ -12,6 +12,7 @@
 
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useViewerZone } from "@/components/edition/LocalTime";
 
 const HUB_TIME_SETTINGS_URL = "https://haruhime.moe/account#time";
@@ -23,26 +24,18 @@ export type TimeHintProps = {
 };
 
 /**
- * @function hourLabel
- * @param hourCycle {"h12" | "h23" | null | undefined} the hub's hour cycle preference
- * @returns {string} "24-hour" for "h23", else "12-hour" ("h12" and null/undefined alike, since
- *          formatInstant's en-US default for a null hourCycle is 12-hour with AM/PM)
- */
-const hourLabel = (hourCycle: "h12" | "h23" | null | undefined): string =>
-  hourCycle === "h23" ? "24-hour" : "12-hour";
-
-/**
  * @function TimeHint
  * @param props {TimeHintProps} the viewer's zone and hour cycle
  * @returns {JSX.Element} "Times in <zone>, <hour format>." linking to the hub's account page
  */
 export function TimeHint({ zone, hourCycle }: TimeHintProps) {
+  const t = useTranslations("tourney.time");
   const viewer = useViewerZone(zone);
   return (
     <p className="text-c3 text-sm">
-      Times in {viewer}, {hourLabel(hourCycle)}.{" "}
+      {t("hint", { zone: viewer, cycle: hourCycle ?? "h12" })}{" "}
       <a href={HUB_TIME_SETTINGS_URL} className="underline">
-        Change
+        {t("change")}
       </a>
     </p>
   );

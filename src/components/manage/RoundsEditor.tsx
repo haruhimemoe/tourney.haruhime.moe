@@ -6,7 +6,7 @@
  *       and the rounds save separately, since a new size can drop rounds.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
@@ -26,6 +26,7 @@ import {
   Th,
 } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { postJson } from "@/lib/manage-client";
 import type { BracketConfig, Edition } from "@/schemas/edition";
@@ -100,6 +101,7 @@ export function RoundsEditor({
   rounds,
   poolsUrl,
 }: RoundsEditorProps) {
+  const t = useTranslations("tourney.rounds");
   const router = useRouter();
   const [bracket, setBracket] = useState<BracketConfig>(config ?? DEFAULT_CONFIG);
   const [quals, setQuals] = useState(qualifiers);
@@ -118,7 +120,7 @@ export function RoundsEditor({
     setBusy(false);
     if (!result.ok) return setNotice({ tone: "error", text: result.message });
     setDrafts(result.data.rounds.map(draftOf));
-    setNotice({ tone: "info", text: "Saved." });
+    setNotice({ tone: "info", text: t("saved") });
     router.refresh();
   };
 
@@ -138,24 +140,24 @@ export function RoundsEditor({
   return (
     <div className="flex flex-col gap-8">
       <section className="flex max-w-2xl flex-col gap-4">
-        <SectionHeading>Bracket</SectionHeading>
+        <SectionHeading>{t("bracket")}</SectionHeading>
         <div className="flex flex-wrap gap-3">
           <Select
             id="format"
-            label="Format"
+            label={t("format")}
             value={bracket.format}
             onChange={(e) =>
               setBracket({ ...bracket, format: e.target.value as BracketConfig["format"] })
             }
             disabled={busy}
           >
-            <option value="double">Double elimination</option>
-            <option value="single">Single elimination</option>
+            <option value="double">{t("doubleElimination")}</option>
+            <option value="single">{t("singleElimination")}</option>
           </Select>
           <TextInput
             id="size"
-            label="Entrants"
-            hint="2 to 256. Byes fill up to the next power of two."
+            label={t("entrants")}
+            hint={t("n2To256Byes")}
             inputMode="numeric"
             value={size}
             onChange={(e) => setSize(e.target.value)}
@@ -163,7 +165,7 @@ export function RoundsEditor({
           />
           <TextInput
             id="default-best-of"
-            label="Default best-of"
+            label={t("defaultBestOf")}
             inputMode="numeric"
             value={defaultBestOf}
             onChange={(e) => setDefaultBestOf(e.target.value)}
@@ -171,22 +173,22 @@ export function RoundsEditor({
           />
           <Select
             id="seeding"
-            label="Seeding"
+            label={t("seeding")}
             value={bracket.seeding}
             onChange={(e) =>
               setBracket({ ...bracket, seeding: e.target.value as BracketConfig["seeding"] })
             }
             disabled={busy}
           >
-            <option value="manual">By hand</option>
-            <option value="qualifiers">From qualifiers</option>
-            <option value="random">Random</option>
+            <option value="manual">{t("byHand")}</option>
+            <option value="qualifiers">{t("fromQualifiers")}</option>
+            <option value="random">{t("random")}</option>
           </Select>
         </div>
         {bracket.format === "double" ? (
           <Checkbox
             id="reset"
-            label="Grand final reset"
+            label={t("grandFinalReset")}
             checked={bracket.grandFinalReset}
             onChange={(e) => setBracket({ ...bracket, grandFinalReset: e.target.checked })}
             disabled={busy}
@@ -194,7 +196,7 @@ export function RoundsEditor({
         ) : (
           <Checkbox
             id="third"
-            label="Third place match"
+            label={t("thirdPlaceMatch")}
             checked={bracket.thirdPlace}
             onChange={(e) => setBracket({ ...bracket, thirdPlace: e.target.checked })}
             disabled={busy}
@@ -203,7 +205,7 @@ export function RoundsEditor({
         <div className="flex flex-wrap items-end gap-3">
           <Checkbox
             id="qualifiers"
-            label="Qualifiers"
+            label={t("qualifiers")}
             checked={quals.enabled}
             onChange={(e) => setQuals({ ...quals, enabled: e.target.checked })}
             disabled={busy}
@@ -211,21 +213,21 @@ export function RoundsEditor({
           {quals.enabled ? (
             <Select
               id="qualifier-method"
-              label="Qualifier ranking"
+              label={t("qualifierRanking")}
               value={quals.method}
               onChange={(e) =>
                 setQuals({ ...quals, method: e.target.value as Edition["qualifiers"]["method"] })
               }
               disabled={busy}
             >
-              <option value="sum">Total score</option>
-              <option value="average-rank">Average rank per map</option>
+              <option value="sum">{t("totalScore")}</option>
+              <option value="average-rank">{t("averageRankPerMap")}</option>
             </Select>
           ) : null}
         </div>
         <div>
           <Button type="button" onClick={saveConfig} disabled={busy}>
-            Save bracket and rebuild rounds
+            {t("saveBracketAndRebuild")}
           </Button>
         </div>
       </section>
@@ -236,18 +238,18 @@ export function RoundsEditor({
       ) : null}
       {drafts.length > 0 ? (
         <section className="flex flex-col gap-4">
-          <SectionHeading>Rounds</SectionHeading>
-          <p className="text-c3 text-sm">Windows are in your time zone.</p>
-          <Table caption="Rounds" hideCaption>
+          <SectionHeading>{t("rounds")}</SectionHeading>
+          <p className="text-c3 text-sm">{t("windowsAreInYour")}</p>
+          <Table caption={t("rounds")} hideCaption>
             <THead>
               <tr>
-                <Th>Code</Th>
-                <Th>Name</Th>
-                <Th>Best of</Th>
-                <Th>Window start</Th>
-                <Th>Window end</Th>
-                <Th>Pool id</Th>
-                <Th>Pool shown</Th>
+                <Th>{t("code")}</Th>
+                <Th>{t("name")}</Th>
+                <Th>{t("bestOf")}</Th>
+                <Th>{t("windowStart")}</Th>
+                <Th>{t("windowEnd")}</Th>
+                <Th>{t("poolId")}</Th>
+                <Th>{t("poolShown")}</Th>
               </tr>
             </THead>
             <TBody>
@@ -257,7 +259,7 @@ export function RoundsEditor({
                   <Td>
                     <TextInput
                       id={`name-${d.code}`}
-                      label={`Name of ${d.code}`}
+                      label={t("nameOfCode", { code: d.code })}
                       hideLabel
                       value={d.name}
                       maxLength={64}
@@ -271,7 +273,7 @@ export function RoundsEditor({
                     ) : (
                       <TextInput
                         id={`bestof-${d.code}`}
-                        label={`Best-of of ${d.code}`}
+                        label={t("bestOfOfCode", { code: d.code })}
                         hideLabel
                         inputMode="numeric"
                         value={d.bestOf}
@@ -283,7 +285,7 @@ export function RoundsEditor({
                   <Td>
                     <TextInput
                       id={`start-${d.code}`}
-                      label={`Window start of ${d.code}`}
+                      label={t("windowStartOfCode", { code: d.code })}
                       hideLabel
                       type="datetime-local"
                       value={d.start}
@@ -294,7 +296,7 @@ export function RoundsEditor({
                   <Td>
                     <TextInput
                       id={`end-${d.code}`}
-                      label={`Window end of ${d.code}`}
+                      label={t("windowEndOfCode", { code: d.code })}
                       hideLabel
                       type="datetime-local"
                       value={d.end}
@@ -306,7 +308,7 @@ export function RoundsEditor({
                     <div className="flex items-center gap-2">
                       <TextInput
                         id={`pool-${d.code}`}
-                        label={`Pool id of ${d.code}`}
+                        label={t("poolIdOfCode", { code: d.code })}
                         hideLabel
                         value={d.poolId}
                         maxLength={64}
@@ -315,7 +317,7 @@ export function RoundsEditor({
                       />
                       {d.poolId.trim() ? (
                         <TextLink href={`${poolsUrl}/pools/${encodeURIComponent(d.poolId.trim())}`}>
-                          Check
+                          {t("check")}
                         </TextLink>
                       ) : null}
                     </div>
@@ -323,7 +325,7 @@ export function RoundsEditor({
                   <Td>
                     <Checkbox
                       id={`revealed-${d.code}`}
-                      label={`Show the pool of ${d.code}`}
+                      label={t("showThePoolOf", { code: d.code })}
                       hideLabel
                       checked={d.poolRevealed}
                       onChange={(e) => setDraft(d.code, { poolRevealed: e.target.checked })}
@@ -340,7 +342,7 @@ export function RoundsEditor({
               onClick={() => send({ rounds: drafts.map(patchOf) })}
               disabled={busy}
             >
-              Save rounds
+              {t("saveRounds")}
             </Button>
           </div>
         </section>

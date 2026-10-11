@@ -5,13 +5,14 @@
  *       found and lists what it left out; nothing saves until the host presses Save.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
 import { Button, Notice, Table, TBody, Td, TextInput, THead, Th } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { postJson } from "@/lib/manage-client";
 
@@ -34,6 +35,7 @@ const cell = (teamId: string, slotKey: string) => `${teamId} ${slotKey}`;
  * @returns {JSX.Element} the mp fill box, the sheet and Save
  */
 export function QualifierScores({ lineage, edition, teams, slots, saved }: QualifierScoresProps) {
+  const t = useTranslations("tourney.qualifierScores");
   const router = useRouter();
   const [values, setValues] = useState<Record<string, string>>(() =>
     Object.fromEntries(saved.map((s) => [cell(s.teamId, s.slotKey), String(s.score)])),
@@ -61,7 +63,7 @@ export function QualifierScores({ lineage, edition, teams, slots, saved }: Quali
     setProblems(result.data.problems);
     setNotice({
       tone: "info",
-      text: `Filled ${result.data.rows.length} scores. Check them, then save.`,
+      text: t("filled", { count: result.data.rows.length }),
     });
   };
 
@@ -79,7 +81,7 @@ export function QualifierScores({ lineage, edition, teams, slots, saved }: Quali
     setBusy(false);
     if (!result.ok) return setNotice({ tone: "error", text: result.message });
     setProblems([]);
-    setNotice({ tone: "info", text: `Saved ${result.data.saved} scores.` });
+    setNotice({ tone: "info", text: t("savedCount", { count: result.data.saved }) });
     router.refresh();
   };
 
@@ -88,8 +90,8 @@ export function QualifierScores({ lineage, edition, teams, slots, saved }: Quali
       <div className="flex flex-wrap items-end gap-2">
         <TextInput
           id="qualifier-mp"
-          label="Lobby mp link"
-          hint="Fills the sheet for the teams in that lobby. Nothing saves until you press Save."
+          label={t("lobbyMpLink")}
+          hint={t("fillsTheSheetFor")}
           value={mpLink}
           onChange={(e) => setMpLink(e.target.value)}
           maxLength={200}
@@ -97,7 +99,7 @@ export function QualifierScores({ lineage, edition, teams, slots, saved }: Quali
           disabled={busy}
         />
         <Button type="button" variant="ghost" onClick={fill} disabled={busy || !mpLink.trim()}>
-          Fill from mp
+          {t("fillFromMp")}
         </Button>
       </div>
       {notice ? (
@@ -107,7 +109,7 @@ export function QualifierScores({ lineage, edition, teams, slots, saved }: Quali
       ) : null}
       {problems.length > 0 ? (
         <Notice tone="error">
-          <p>Left out of the fill:</p>
+          <p>{t("leftOutOfThe")}</p>
           <ul className="list-disc pl-5">
             {problems.map((p) => (
               <li key={`${p.gameId} ${p.message}`}>{p.message}</li>
@@ -115,10 +117,10 @@ export function QualifierScores({ lineage, edition, teams, slots, saved }: Quali
           </ul>
         </Notice>
       ) : null}
-      <Table caption="Qualifier scores" hideCaption>
+      <Table caption={t("qualifierScores")} hideCaption>
         <THead>
           <tr>
-            <Th>Team</Th>
+            <Th>{t("team")}</Th>
             {slots.map((s) => (
               <Th key={s.slotKey}>{s.label}</Th>
             ))}
@@ -150,7 +152,7 @@ export function QualifierScores({ lineage, edition, teams, slots, saved }: Quali
       </Table>
       <div>
         <Button type="button" onClick={save} disabled={busy}>
-          Save scores
+          {t("saveScores")}
         </Button>
       </div>
     </div>

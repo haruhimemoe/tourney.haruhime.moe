@@ -7,7 +7,7 @@
  *       missed the session.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { osuAvatarSrc } from "@haruhimemoe/next-kit/auth-react";
@@ -16,6 +16,7 @@ import { userUrl } from "@haruhimemoe/osu/shapes";
 import { ButtonLink, Card, PageHeader, TextLink } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { SEO_SITE } from "@/constants/seo";
 import { HUB_ACCOUNT_URL } from "@/constants/site";
 import { RestoreSignedIn, SignOutButton } from "@/lib/account";
@@ -33,25 +34,26 @@ export const metadata: Metadata = pageMetadata(SEO_SITE, {
  * @returns {Promise<JSX.Element>} the signed-in user's osu! account (a visitor goes to sign in)
  */
 export default async function AccountPage() {
+  const t = await getTranslations("tourney.pages.account");
   const user = await requireUser("/account");
   const avatar = osuAvatarSrc(user.avatarUrl);
   return (
     <div className="flex flex-col gap-6">
       <RestoreSignedIn />
       <PageHeader
-        title="tourney settings"
+        title={t("tourneySettings")}
         actions={
           <>
             {user.isAdmin ? (
               <ButtonLink href="/admin/hosts" variant="secondary">
-                Admin
+                {t("admin")}
               </ButtonLink>
             ) : null}
             <SignOutButton />
           </>
         }
       />
-      <Card title="Your osu! account">
+      <Card title={t("yourOsuAccount")}>
         <div className="flex items-center gap-3">
           {avatar ? (
             <Image src={avatar} alt="" width={48} height={48} className="rounded-full" />
@@ -62,7 +64,7 @@ export default async function AccountPage() {
         </div>
         <p className="mt-3 text-c3 text-sm">
           Your sessions, exporting your data and deleting your haruhime account are on{" "}
-          <TextLink href={HUB_ACCOUNT_URL}>haruhime.moe/account</TextLink>.
+          <TextLink href={HUB_ACCOUNT_URL}>{t("haruhimeMoeAccount")}</TextLink>.
         </p>
       </Card>
     </div>

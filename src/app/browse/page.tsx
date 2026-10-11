@@ -9,6 +9,7 @@
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { PageHeader, Pagination } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { BrowseList } from "@/components/home/BrowseList";
 import { PAGE_SEO, SEO_SITE } from "@/constants/seo";
 import { getCurrentUser } from "@/lib/auth-session";
@@ -32,6 +33,7 @@ type Props = { searchParams: Promise<{ page?: string }> };
  * @returns {Promise<JSX.Element>} the open editions
  */
 export default async function BrowsePage({ searchParams }: Props) {
+  const t = await getTranslations("tourney.pages.browse");
   const requested = Number.parseInt((await searchParams).page ?? "1", 10);
   const page = Number.isFinite(requested) && requested > 0 ? requested : 1;
   const [{ items, pages }, user] = await Promise.all([
@@ -41,7 +43,7 @@ export default async function BrowsePage({ searchParams }: Props) {
   const { zone, hourCycle } = await resolveViewerPrefs(user?.id ?? null, user?.preferences ?? null);
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Open registrations" lead="osu! tournaments taking players now." />
+      <PageHeader title={t("openRegistrations")} lead={t("osuTournamentsTakingPlayers")} />
       <BrowseList items={items} zone={zone} hourCycle={hourCycle} />
       {pages > 1 ? (
         <Pagination page={page} pageCount={pages} hrefFor={(n) => `/browse?page=${n}`} />

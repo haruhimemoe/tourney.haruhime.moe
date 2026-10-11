@@ -5,7 +5,7 @@
  *       Controlled: the caller holds the list and saves it.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
@@ -19,6 +19,7 @@ import {
   Textarea,
   TextInput,
 } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { MAX_QUESTIONS, type Question } from "@/schemas/question";
 
@@ -29,15 +30,15 @@ export type QuestionBuilderProps = {
   disabled?: boolean;
 };
 
-const TYPE_LABELS: Record<Question["type"], string> = {
-  text: "Short text",
-  longText: "Long text",
-  number: "Number",
-  url: "Link",
-  checkbox: "Checkbox",
-  choice: "One choice",
-  multi: "Several choices",
-};
+const TYPES: readonly Question["type"][] = [
+  "text",
+  "longText",
+  "number",
+  "url",
+  "checkbox",
+  "choice",
+  "multi",
+];
 
 const newId = () => `q${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
@@ -55,11 +56,12 @@ const withType = (q: Question, type: Question["type"]): Question => {
  * @returns {JSX.Element} the editable list
  */
 export function QuestionBuilder({ value, onChange, disabled = false }: QuestionBuilderProps) {
+  const t = useTranslations("tourney.questionBuilder");
   const [optionText, setOptionText] = useState<Record<string, string>>(() =>
     Object.fromEntries(value.map((q) => [q.id, "options" in q ? q.options.join("\n") : ""])),
   );
   const full = value.length >= MAX_QUESTIONS;
-  const name = (q: Question, index: number) => q.label.trim() || `Question ${index + 1}`;
+  const name = (q: Question, index: number) => q.label.trim() || t("questionN", { n: index + 1 });
 
   const update = (id: string, change: (q: Question) => Question) =>
     onChange(value.map((q) => (q.id === id ? change(q) : q)));
@@ -84,7 +86,7 @@ export function QuestionBuilder({ value, onChange, disabled = false }: QuestionB
         items={value}
         getId={(q) => q.id}
         getLabel={(q) => name(q, value.indexOf(q))}
-        label="Registration questions"
+        label={t("registrationQuestions")}
         disabled={disabled}
         onMove={({ from, to }) => onChange(moveItem(value, from.index, to.index))}
         className="flex flex-col gap-3"
@@ -95,7 +97,7 @@ export function QuestionBuilder({ value, onChange, disabled = false }: QuestionB
               {handle}
               <TextInput
                 id={`qlabel-${q.id}`}
-                label={`Question ${index + 1}`}
+                label={t("questionIndex", { index: index + 1 })}
                 value={q.label}
                 onChange={(e) => update(q.id, (x) => ({ ...x, label: e.target.value }))}
                 maxLength={200}
@@ -107,31 +109,31 @@ export function QuestionBuilder({ value, onChange, disabled = false }: QuestionB
                 type="button"
                 variant="ghost"
                 size="sm"
-                aria-label={`Remove ${name(q, index)}`}
+                aria-label={t("removeIndex", { index: name(q, index) })}
                 onClick={() => onChange(value.filter((x) => x.id !== q.id))}
                 disabled={disabled}
               >
-                Remove
+                {t("remove")}
               </Button>
             </div>
             <Select
               id={`qtype-${q.id}`}
-              label={`Type of ${name(q, index)}`}
+              label={t("typeOfIndex", { index: name(q, index) })}
               value={q.type}
               onChange={(e) => update(q.id, (x) => withType(x, e.target.value as Question["type"]))}
               disabled={disabled}
             >
-              {Object.entries(TYPE_LABELS).map(([type, label]) => (
+              {TYPES.map((type) => (
                 <option key={type} value={type}>
-                  {label}
+                  {t(`types.${type}`)}
                 </option>
               ))}
             </Select>
             {q.type === "choice" || q.type === "multi" ? (
               <Textarea
                 id={`qoptions-${q.id}`}
-                label={`Options for ${name(q, index)}`}
-                hint="One per line, 2 to 30."
+                label={t("optionsForIndex", { index: name(q, index) })}
+                hint={t("onePerLine2")}
                 value={optionText[q.id] ?? q.options.join("\n")}
                 onChange={(e) => setOptions(q.id, e.target.value)}
                 rows={3}
@@ -140,7 +142,7 @@ export function QuestionBuilder({ value, onChange, disabled = false }: QuestionB
             ) : null}
             <TextInput
               id={`qhelp-${q.id}`}
-              label="Help text"
+              label={t("helpText")}
               value={q.help}
               onChange={(e) => update(q.id, (x) => ({ ...x, help: e.target.value }))}
               maxLength={500}
@@ -148,7 +150,7 @@ export function QuestionBuilder({ value, onChange, disabled = false }: QuestionB
             />
             <Checkbox
               id={`qrequired-${q.id}`}
-              label="Required"
+              label={t("required")}
               checked={q.required}
               onChange={(e) => update(q.id, (x) => ({ ...x, required: e.target.checked }))}
               disabled={disabled}
@@ -158,7 +160,7 @@ export function QuestionBuilder({ value, onChange, disabled = false }: QuestionB
       </SortableList>
       <div className="flex items-center gap-3">
         <Button type="button" variant="ghost" onClick={add} disabled={disabled || full}>
-          Add question
+          {t("addQuestion")}
         </Button>
         {full ? <span className="text-c3 text-sm">{MAX_QUESTIONS} questions at most.</span> : null}
       </div>

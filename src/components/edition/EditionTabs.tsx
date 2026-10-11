@@ -3,13 +3,14 @@
  * @desc The public edition's tabs as links, the current one from the path.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
 import { LinkTabs } from "@haruhimemoe/ui";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 /** The tabs after Overview: their path segment and label. */
 export const EDITION_TABS = [
@@ -26,15 +27,16 @@ export const EDITION_TABS = [
  * @returns {JSX.Element} the tab links
  */
 export function EditionTabs({ base }: { base: string }) {
+  const t = useTranslations("tourney.editionTabs");
   const path = usePathname();
   return (
     <LinkTabs
-      label="Edition"
+      label={t("edition")}
       items={[
-        { href: base, label: "Overview", current: path === base },
-        ...EDITION_TABS.map(([segment, label]) => ({
+        { href: base, label: t("overview"), current: path === base },
+        ...EDITION_TABS.map(([segment]) => ({
           href: `${base}/${segment}`,
-          label,
+          label: t(`tabs.${segment}`),
           current: path === `${base}/${segment}`,
         })),
       ]}

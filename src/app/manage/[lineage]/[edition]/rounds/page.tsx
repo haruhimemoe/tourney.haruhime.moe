@@ -3,13 +3,14 @@
  * @desc The bracket config and its rounds, for lineage members.
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { PageHeader } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { RoundsEditor } from "@/components/manage/RoundsEditor";
 import { SEO_SITE } from "@/constants/seo";
 import { getPoolsUrl } from "@/env";
@@ -40,6 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * @returns {Promise<JSX.Element>} the config form and rounds table
  */
 export default async function RoundsPage({ params }: Props) {
+  const t = await getTranslations("tourney.pages.manageLineageEditionRounds");
   const { lineage: lineageSlug, edition: editionSlug } = await params;
   const user = await requireUser(`/manage/${lineageSlug}/${editionSlug}/rounds`);
   const found = await getEdition(lineageSlug, editionSlug);
@@ -47,7 +49,7 @@ export default async function RoundsPage({ params }: Props) {
   const { lineage, edition } = found;
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Bracket and rounds" lead={edition.name} />
+      <PageHeader title={t("bracketAndRounds")} lead={edition.name} />
       <RoundsEditor
         lineage={lineage.slug}
         edition={edition.slug}

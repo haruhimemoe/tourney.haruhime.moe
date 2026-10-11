@@ -9,6 +9,7 @@
  */
 
 import { Badge, Card, Disclosure, TextLink } from "@haruhimemoe/ui";
+import { useTranslations } from "next-intl";
 import { AvailabilityEditor } from "@/components/availability/AvailabilityEditor";
 import { LocalTime } from "@/components/edition/LocalTime";
 import type { PlayingEntry } from "@/services/dashboard";
@@ -25,20 +26,14 @@ export type PlayingTabProps = {
   availability: Readonly<Record<string, SavedAvailability>>;
 };
 
-const STATUS: Record<string, string> = {
-  pending: "Waiting for review",
-  approved: "Approved",
-  waitlisted: "Waitlisted",
-  rejected: "Not accepted",
-  withdrawn: "Withdrawn",
-};
-
 /**
  * @function PlayingTab
  * @param props {PlayingTabProps} the entries
  * @returns {JSX.Element} one card per edition
  */
 export function PlayingTab({ entries, zone, hourCycle, availability }: PlayingTabProps) {
+  const t = useTranslations("tourney.playingTab");
+  const tt = useTranslations("tourney");
   return (
     <div className="flex flex-col gap-4">
       {entries.map(({ edition, registration, team, nextMatch, poolUrl }) => {
@@ -48,24 +43,31 @@ export function PlayingTab({ entries, zone, hourCycle, availability }: PlayingTa
           <Card key={edition.id} title={<TextLink href={base}>{edition.name}</TextLink>}>
             <div className="flex flex-col gap-3 text-sm">
               <div className="flex flex-wrap gap-2">
-                <Badge>{STATUS[registration.status] ?? registration.status}</Badge>
+                <Badge>
+                  {tt.has(`status.${registration.status}`)
+                    ? tt(`status.${registration.status}`)
+                    : registration.status}
+                </Badge>
                 {team ? <Badge>{team.name}</Badge> : null}
               </div>
               {nextMatch ? (
                 <p>
-                  Next:{" "}
-                  <TextLink href={`${base}/m/${nextMatch.code}`}>
-                    {nextMatch.code} ({nextMatch.round})
-                  </TextLink>{" "}
-                  vs {nextMatch.opponent ?? "TBD"},{" "}
-                  <LocalTime at={nextMatch.at} zone={zone} hourCycle={hourCycle} />
+                  {t.rich("next", {
+                    code: nextMatch.code,
+                    round: nextMatch.round,
+                    opponent: nextMatch.opponent ?? t("tbd"),
+                    link: (chunks) => (
+                      <TextLink href={`${base}/m/${nextMatch.code}`}>{chunks}</TextLink>
+                    ),
+                    time: () => <LocalTime at={nextMatch.at} zone={zone} hourCycle={hourCycle} />,
+                  })}
                 </p>
               ) : (
-                <p className="text-c3">No match scheduled yet.</p>
+                <p className="text-c3">{t("noMatchScheduledYet")}</p>
               )}
-              {poolUrl ? <TextLink href={poolUrl}>Round pool</TextLink> : null}
+              {poolUrl ? <TextLink href={poolUrl}>{t("roundPool")}</TextLink> : null}
               {registration.status !== "withdrawn" && registration.status !== "rejected" ? (
-                <Disclosure summary="Your availability">
+                <Disclosure summary={t("yourAvailability")}>
                   <AvailabilityEditor
                     editionId={edition.id}
                     zone={saved?.zone ?? zone}

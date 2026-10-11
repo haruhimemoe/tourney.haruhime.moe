@@ -5,7 +5,7 @@
  *       edition that isn't public yet answers 404 to everyone but its hosts.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
@@ -14,6 +14,7 @@ import { isRegistrationOpen } from "@haruhimemoe/tourney";
 import { Notice, PageHeader, StatList } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { RegisterForm } from "@/components/registration/RegisterForm";
 import { SEO_SITE } from "@/constants/seo";
 import { requireUser } from "@/lib/auth-session";
@@ -24,20 +25,28 @@ import { getOwnRegistration } from "@/services/registrations";
 
 type Props = { params: Promise<{ lineage: string; edition: string }> };
 
-const when = (iso: string | null, fallback: string) =>
+type T = Awaited<ReturnType<typeof getTranslations<"tourney.pages.lineageEditionRegister">>>;
+
+const when = (t: T, locale: string, iso: string | null, fallback: string) =>
   iso
-    ? `${new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(iso))} UTC`
+    ? t("utc", {
+        time: new Intl.DateTimeFormat(locale, {
+          dateStyle: "medium",
+          timeStyle: "short",
+          timeZone: "UTC",
+        }).format(new Date(iso)),
+      })
     : fallback;
 
-const eligibilityText = (rules: Edition["eligibility"]): string => {
+const eligibilityText = (t: T, rules: Edition["eligibility"]): string => {
   const parts: string[] = [];
-  if (rules.rank) parts.push(`rank #${rules.rank.min} to #${rules.rank.max}`);
-  if (rules.countries) parts.push(`from ${rules.countries.join(", ")}`);
+  if (rules.rank) parts.push(t("rank", { min: rules.rank.min, max: rules.rank.max }));
+  if (rules.countries) parts.push(t("from", { countries: rules.countries.join(", ") }));
   if (rules.regions) {
     const names = CONTINENTS.filter((c) => rules.regions?.includes(c.id)).map((c) => c.name);
-    parts.push(`in ${names.join(", ")}`);
+    parts.push(t("in", { regions: names.join(", ") }));
   }
-  return parts.length ? parts.join("; ") : "Anyone";
+  return parts.length ? parts.join("; ") : t("anyone");
 };
 
 /**
@@ -60,6 +69,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * @returns {Promise<JSX.Element>} the registration page
  */
 export default async function RegisterPage({ params }: Props) {
+  const t = await getTranslations("tourney.pages.lineageEditionRegister");
   const { lineage: lineageSlug, edition: editionSlug } = await params;
   const user = await requireUser(`/${lineageSlug}/${editionSlug}/register`);
   const found = await getEdition(lineageSlug, editionSlug);
@@ -71,15 +81,16 @@ export default async function RegisterPage({ params }: Props) {
   const own = await getOwnRegistration(user.id, edition.id);
   const open = isRegistrationOpen(edition, new Date());
   const { registration: window } = edition;
+  const locale = await getLocale();
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title={`Register for ${edition.name}`} lead={lineage.name} />
+      <PageHeader title={t("registerForName", { name: edition.name })} lead={lineage.name} />
       <StatList
         items={[
-          { label: "Opens", value: when(window.opensAt, "Now") },
-          { label: "Closes", value: when(window.closesAt, "When the hosts close it") },
-          { label: "Player cap", value: window.playerCap ? String(window.playerCap) : "None" },
-          { label: "Who can join", value: eligibilityText(edition.eligibility) },
+          { label: t("opens"), value: when(t, locale, window.opensAt, t("now")) },
+          { label: t("closes"), value: when(t, locale, window.closesAt, t("whenHostsClose")) },
+          { label: t("cap"), value: window.playerCap ? String(window.playerCap) : t("none") },
+          { label: t("who"), value: eligibilityText(t, edition.eligibility) },
         ]}
       />
       {open || own ? (
@@ -91,7 +102,7 @@ export default async function RegisterPage({ params }: Props) {
           existing={own ? { status: own.status, answers: own.answers } : null}
         />
       ) : (
-        <Notice tone="info">Registration isn't open.</Notice>
+        <Notice tone="info">{t("registrationIsnTOpen")}</Notice>
       )}
     </div>
   );

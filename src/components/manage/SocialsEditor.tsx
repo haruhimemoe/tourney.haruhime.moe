@@ -17,6 +17,7 @@
 
 import { Button, moveItem, Notice, Select, SortableList, TextInput } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { type FormEvent, useState } from "react";
 import type { FieldIssue } from "@/lib/manage-client";
 import { postJson } from "@/lib/manage-client";
@@ -79,6 +80,7 @@ const fieldErrors = (
  * @returns {JSX.Element} the editable list and its save button
  */
 export function SocialsEditor({ lineage, edition, initial }: SocialsEditorProps) {
+  const t = useTranslations("tourney.socialsEditor");
   const router = useRouter();
   const [rows, setRows] = useState<Row[]>(() => toRows(initial));
   const [errors, setErrors] = useState<RowErrors>({});
@@ -113,7 +115,7 @@ export function SocialsEditor({ lineage, edition, initial }: SocialsEditorProps)
       return;
     }
     setErrors({});
-    setNotice({ tone: "info", text: "Saved." });
+    setNotice({ tone: "info", text: t("saved") });
     router.refresh();
   };
 
@@ -123,7 +125,7 @@ export function SocialsEditor({ lineage, edition, initial }: SocialsEditorProps)
         items={rows}
         getId={(r) => r.key}
         getLabel={name}
-        label="Social links"
+        label={t("socialLinks")}
         disabled={busy}
         onMove={({ from, to }) => setRows((prev) => moveItem(prev, from.index, to.index))}
         className="flex flex-col gap-3"
@@ -134,7 +136,7 @@ export function SocialsEditor({ lineage, edition, initial }: SocialsEditorProps)
               {handle}
               <Select
                 id={`social-kind-${row.key}`}
-                label={`Kind of social ${index + 1}`}
+                label={t("kindOfSocialIndex", { index: index + 1 })}
                 value={row.kind}
                 onChange={(e) =>
                   update(row.key, (r) => {
@@ -152,7 +154,7 @@ export function SocialsEditor({ lineage, edition, initial }: SocialsEditorProps)
               </Select>
               <TextInput
                 id={`social-url-${row.key}`}
-                label="URL"
+                label={t("url")}
                 value={row.url}
                 onChange={(e) => update(row.key, (r) => ({ ...r, url: e.target.value }))}
                 error={errors[row.key]?.url}
@@ -162,7 +164,7 @@ export function SocialsEditor({ lineage, edition, initial }: SocialsEditorProps)
               {row.kind === "custom" ? (
                 <TextInput
                   id={`social-label-${row.key}`}
-                  label="Label"
+                  label={t("label")}
                   maxLength={40}
                   value={row.label ?? ""}
                   onChange={(e) =>
@@ -177,11 +179,11 @@ export function SocialsEditor({ lineage, edition, initial }: SocialsEditorProps)
                 type="button"
                 variant="ghost"
                 size="sm"
-                aria-label={`Remove ${name(row)} link`}
+                aria-label={t("removeRowLink", { row: name(row) })}
                 onClick={() => setRows((prev) => prev.filter((r) => r.key !== row.key))}
                 disabled={busy}
               >
-                Remove
+                {t("remove")}
               </Button>
             </div>
           </div>
@@ -189,7 +191,7 @@ export function SocialsEditor({ lineage, edition, initial }: SocialsEditorProps)
       </SortableList>
       <div className="flex items-center gap-3">
         <Button type="button" variant="ghost" onClick={add} disabled={busy || full}>
-          Add social
+          {t("addSocial")}
         </Button>
         {full ? <span className="text-c3 text-sm">{MAX_SOCIALS} socials at most.</span> : null}
       </div>
@@ -200,7 +202,7 @@ export function SocialsEditor({ lineage, edition, initial }: SocialsEditorProps)
       ) : null}
       <div>
         <Button type="submit" disabled={busy}>
-          Save socials
+          {t("saveSocials")}
         </Button>
       </div>
     </form>

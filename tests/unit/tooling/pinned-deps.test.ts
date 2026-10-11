@@ -24,7 +24,7 @@ describe("package.json", () => {
     expect(loose).toEqual([]);
   });
 
-  it("pins @haruhimemoe/next-kit to 0.18.0", () => {
-    expect(pkg.dependencies["@haruhimemoe/next-kit"]).toBe("0.18.0");
+  it("pins @haruhimemoe/next-kit to 0.19.1", () => {
+    expect(pkg.dependencies["@haruhimemoe/next-kit"]).toBe("0.19.1");
   });
 });

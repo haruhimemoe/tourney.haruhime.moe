@@ -4,13 +4,14 @@
  *       refusal (seeds missing, results already in).
  * @author David @dvhsh (https://dvh.sh)
  * @created Thu Oct 8, 2026
- * @modified Thu Oct 8, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 "use client";
 
 import { Button, Notice } from "@haruhimemoe/ui";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { postJson } from "@/lib/manage-client";
 
@@ -23,6 +24,7 @@ export type GenerateBracketButtonProps = { lineage: string; edition: string; exi
  * @returns {JSX.Element} the button and any refusal
  */
 export function GenerateBracketButton({ lineage, edition, exists }: GenerateBracketButtonProps) {
+  const t = useTranslations("tourney.generateBracketButton");
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ tone: "info" | "error"; text: string } | null>(null);
@@ -31,14 +33,14 @@ export function GenerateBracketButton({ lineage, edition, exists }: GenerateBrac
     const result = await postJson(`/api/manage/${lineage}/${edition}/bracket`, {});
     setBusy(false);
     if (!result.ok) return setNotice({ tone: "error", text: result.message });
-    setNotice({ tone: "info", text: "Bracket made." });
+    setNotice({ tone: "info", text: t("bracketMade") });
     router.refresh();
   };
   return (
     <div className="flex flex-col gap-2">
       <div>
         <Button onClick={make} disabled={busy}>
-          {exists ? "Remake the bracket" : "Make the bracket"}
+          {exists ? t("remake") : t("make")}
         </Button>
       </div>
       {notice ? (

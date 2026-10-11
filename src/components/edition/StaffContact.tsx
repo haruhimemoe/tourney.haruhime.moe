@@ -8,6 +8,7 @@
  * @modified Sun Oct 11, 2026
  */
 
+import { useTranslations } from "next-intl";
 import type { Contact } from "@/schemas/social";
 
 /** StaffContact's props: the edition's contact. */
@@ -19,11 +20,12 @@ export type StaffContactProps = { contact: Contact };
  * @returns {JSX.Element | null} the "contact staff" line, or nothing when both are unset
  */
 export function StaffContact({ contact }: StaffContactProps) {
+  const t = useTranslations("tourney.staffContact");
   const { email, discord } = contact;
   if (!email && !discord) return null;
   return (
     <p className="text-c3 text-sm">
-      Questions? Contact staff
+      {t("questionsContactStaff")}
       {discord ? (
         <>
           {" "}

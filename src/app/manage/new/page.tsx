@@ -4,12 +4,13 @@
  *       one. Visitors go to sign in; never indexed.
  * @author David @dvhsh (https://dvh.sh)
  * @created Wed Oct 7, 2026
- * @modified Wed Oct 7, 2026
+ * @modified Sun Oct 11, 2026
  */
 
 import { pageMetadata } from "@haruhimemoe/next-kit/seo";
 import { PageHeader, TextLink } from "@haruhimemoe/ui";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { CreateEditionForm } from "@/components/manage/CreateEditionForm";
 import { SEO_SITE } from "@/constants/seo";
 import { SITE } from "@/constants/site";
@@ -28,16 +29,17 @@ export const metadata: Metadata = pageMetadata(SEO_SITE, {
  * @returns {Promise<JSX.Element>} the create form
  */
 export default async function NewEditionPage() {
+  const t = await getTranslations("tourney.pages.manageNew");
   const user = await requireUser("/manage/new");
   const lineages = await listMemberLineages(user.id);
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Host a tournament"
+        title={t("hostATournament")}
         lead={
           <>
             One active edition per account. Need more? Ask on the{" "}
-            <TextLink href={SITE.discordUrl}>Discord server</TextLink>.
+            <TextLink href={SITE.discordUrl}>{t("discordServer")}</TextLink>.
           </>
         }
       />
