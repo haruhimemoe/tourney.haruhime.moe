@@ -12,7 +12,7 @@
         "@haruhimemoe/osu": "0.7.0",
         "@haruhimemoe/pool": "0.4.0",
         "@haruhimemoe/time": "0.1.0",
-        "@haruhimemoe/tourney": "0.2.1",
+        "@haruhimemoe/tourney": "0.5.0",
         "@haruhimemoe/ui": "0.27.1",
         "@haruhimemoe/vcs": "0.1.0",
         "@mdx-js/loader": "3.1.1",
@@ -157,7 +157,7 @@
 
     "@haruhimemoe/time": ["@haruhimemoe/time@0.1.0", "", { "peerDependencies": { "zod": "^4.0.16" } }, "sha512-ddalJLvNMiE/fQA+c6gJeO8zNU6GX/ycqKBHrtQoNsJ6tGl7Plkl7bj3jajwS+DFbTbZu6LFpgn26o8GRta5pw=="],
 
-    "@haruhimemoe/tourney": ["@haruhimemoe/tourney@0.2.1", "", { "peerDependencies": { "@haruhimemoe/osu": "^0.5.0 || ^0.6.0 || ^0.7.0", "@haruhimemoe/pool": "^0.3.0", "@haruhimemoe/time": "^0.1.0", "zod": "^4.0.16" }, "optionalPeers": ["@haruhimemoe/osu"] }, "sha512-zoSQq7g7/K9m+w8f/I9KgPh3TworQuHJaTvDxg1UxdkegtufrLJIJg++CiDqmhhGal6nU+x0krDbuybz3o98lA=="],
+    "@haruhimemoe/tourney": ["@haruhimemoe/tourney@0.5.0", "", { "peerDependencies": { "@haruhimemoe/osu": "^0.5.0 || ^0.6.0 || ^0.7.0", "@haruhimemoe/pool": "^0.3.0", "@haruhimemoe/time": "^0.1.0", "zod": "^4.0.16" }, "optionalPeers": ["@haruhimemoe/osu"] }, "sha512-zhwUv9utUffy0ztCWvuDUOOp+7ZQNP4syd4kwPYhgAFhKVJ2ob1ygwNu5F8YtlwpZi5zcEHfeJK18e4YnO9TTw=="],
 
     "@haruhimemoe/ui": ["@haruhimemoe/ui@0.27.1", "", { "dependencies": { "tailwind-merge": "3.7.0" }, "peerDependencies": { "next": ">=16.0.0 <17", "react": ">=19.0.0", "react-dom": ">=19.0.0", "shiki": ">=4.5.0 <5", "tailwindcss": ">=4.1.0 <5" }, "optionalPeers": ["shiki"] }, "sha512-LrFWvee+3PKBytN687sIHEQyQkIoV18OIGwFDzjZQ/Ps7m1HPmRyWIKLmiaS5x3qXHjqRG1Xr1lRtg6jHtLmBA=="],
 
